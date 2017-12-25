@@ -1,3 +1,8 @@
+Terminals unused in grammar
+
+   IF
+
+
 Grammar
 
     0 $accept: prog $end
@@ -26,17 +31,18 @@ IDENTIFIER (259) 4
 DISP (260) 5
 DEFINE (261) 6
 BOOL (262) 7
+IF (263)
 
 
 Nonterminals, with rules where they appear
 
-$accept (10)
+$accept (11)
     on left: 0
-prog (11)
+prog (12)
     on left: 1, on right: 0
-expr (12)
+expr (13)
     on left: 2 3 4 5 6 7, on right: 8 9
-pair (13)
+pair (14)
     on left: 8 9, on right: 1 2 9
 
 

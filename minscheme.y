@@ -1,4 +1,4 @@
-%token INTEGER IDENTIFIER DISP DEFINE BOOL
+%token INTEGER IDENTIFIER DISP DEFINE BOOL IF
 
 %{
     #include <stdio.h>
@@ -59,47 +59,3 @@ pair:
 
 %%
 
-/*
-    static char tmpstrbuf[32] = {0,};
-    char* ll2str(long long n){
-        sprintf(tmpstrbuf, "%lld", n);
-        return tmpstrbuf;
-    }
-    //char str[] = "1"; 
-    static int error_flag = NO_ERR;
-%}
-
-%%
-
-prog: 
-        pair           {
-                            }
-    ;
-
-expr:
-        INTEGER     {   long long val = strtoll(yytext, NULL, 10);
-                        //printf("[%s]", yytext);
-                        $$ = val;   }
-    |   IDENTIFIER  {   int value;
-                        error_flag = get_from_symtab(yytext, &value);
-                        if(error_flag == UNBOUND_VARIABLE) {
-                            fprintf(yyout, unbound_variable_errmsg); 
-                        }
-                        $$ = yytext;
-                    }
-    |   '(' pair ')'   {   $$ = $2;    }
-    |   '(' DISP expr ')'   {   fprintf(yyout, ll2str($3)); 
-                                //printf("[%lld]", $3);
-                                //printf("(%d = %d)\n", $3, str);
-                            }
-    |   '(' DEFINE IDENTIFIER expr ')'  {   int value = $4;
-                                            add_to_symtab($3, &value);
-                                            fprintf(yyout, $3); 
-                                        }
-    ;
-
-pair:
-        expr                {$$ = $1;}
-    |   expr pair      {$$ = $1;}
-    ;
-*/

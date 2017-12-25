@@ -143,7 +143,6 @@ SCENARIO("identifier"){
         del_mockfile(mockfile);
     }
 
-    /*
     SECTION("if"){
         char    tmpstr[]= "(if (= 1 1) 1 2)";
         FILE*   mockfile= new_mockfile(tmpstr);
@@ -159,6 +158,4 @@ SCENARIO("identifier"){
         finish_yyin_to_eof();
         del_mockfile(mockfile);
     }
-    */
-
 } 

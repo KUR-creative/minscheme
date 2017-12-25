@@ -376,8 +376,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 9
-#define YY_END_OF_BUFFER 10
+#define YY_NUM_RULES 10
+#define YY_END_OF_BUFFER 11
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -385,11 +385,11 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static yyconst flex_int16_t yy_accept[25] =
+static yyconst flex_int16_t yy_accept[27] =
     {   0,
-        0,    0,   10,    8,    7,    7,    5,    8,    6,    5,
-        4,    5,    5,    3,    4,    5,    5,    5,    5,    5,
-        1,    5,    2,    0
+        0,    0,   11,    9,    8,    8,    6,    9,    7,    6,
+        5,    6,    6,    6,    3,    5,    6,    6,    4,    6,
+        6,    6,    1,    6,    2,    0
     } ;
 
 static yyconst YY_CHAR yy_ec[256] =
@@ -430,36 +430,36 @@ static yyconst YY_CHAR yy_meta[17] =
         2,    2,    2,    2,    2,    2
     } ;
 
-static yyconst flex_uint16_t yy_base[26] =
+static yyconst flex_uint16_t yy_base[28] =
     {   0,
-        0,    0,   31,   32,   32,   32,    0,    6,   32,   22,
-       21,    8,    0,   32,   20,   16,   11,   13,   10,   10,
-        0,   11,    0,   32,   17
+        0,    0,   32,   33,   33,   33,    0,    6,   33,   23,
+       22,    8,   18,    0,   33,   20,   16,   11,    0,   13,
+       10,   10,    0,   11,    0,   33,   17
     } ;
 
-static yyconst flex_int16_t yy_def[26] =
+static yyconst flex_int16_t yy_def[28] =
     {   0,
-       24,    1,   24,   24,   24,   24,   25,   24,   24,   25,
-       25,   25,   25,   24,   25,   25,   25,   25,   25,   25,
-       25,   25,   25,    0,   24
+       26,    1,   26,   26,   26,   26,   27,   26,   26,   27,
+       27,   27,   27,   27,   26,   27,   27,   27,   27,   27,
+       27,   27,   27,   27,   27,    0,   26
     } ;
 
-static yyconst flex_uint16_t yy_nxt[49] =
+static yyconst flex_uint16_t yy_nxt[50] =
     {   0,
         4,    5,    6,    7,    8,    9,   10,   11,   12,    7,
-        7,    7,    7,    7,    7,    7,   14,   16,   13,   17,
-       23,   14,   22,   21,   20,   19,   18,   15,   15,   15,
-       24,    3,   24,   24,   24,   24,   24,   24,   24,   24,
-       24,   24,   24,   24,   24,   24,   24,   24
+        7,   13,    7,    7,    7,    7,   15,   17,   14,   18,
+       25,   15,   24,   23,   22,   21,   20,   16,   19,   16,
+       16,   26,    3,   26,   26,   26,   26,   26,   26,   26,
+       26,   26,   26,   26,   26,   26,   26,   26,   26
     } ;
 
-static yyconst flex_int16_t yy_chk[49] =
+static yyconst flex_int16_t yy_chk[50] =
     {   0,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    8,   12,   25,   12,
-       22,    8,   20,   19,   18,   17,   16,   15,   11,   10,
-        3,   24,   24,   24,   24,   24,   24,   24,   24,   24,
-       24,   24,   24,   24,   24,   24,   24,   24
+        1,    1,    1,    1,    1,    1,    8,   12,   27,   12,
+       24,    8,   22,   21,   20,   18,   17,   16,   13,   11,
+       10,    3,   26,   26,   26,   26,   26,   26,   26,   26,
+       26,   26,   26,   26,   26,   26,   26,   26,   26
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -729,13 +729,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 25 )
+				if ( yy_current_state >= 27 )
 					yy_c = yy_meta[(unsigned int) yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 32 );
+		while ( yy_base[yy_current_state] != 33 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -776,37 +776,42 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 13 "minscheme.l"
-{ return INTEGER; }
+#line 12 "minscheme.l"
+{ return IF; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 14 "minscheme.l"
-{ return IDENTIFIER; }
+{ return INTEGER; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 16 "minscheme.l"
-{ return *yytext; }
+#line 15 "minscheme.l"
+{ return IDENTIFIER; }
 	YY_BREAK
 case 7:
-/* rule 7 can match eol */
 YY_RULE_SETUP
-#line 18 "minscheme.l"
+#line 17 "minscheme.l"
+{ return *yytext; }
+	YY_BREAK
+case 8:
+/* rule 8 can match eol */
+YY_RULE_SETUP
+#line 19 "minscheme.l"
 ; /* skip whitespace */
 	YY_BREAK
 /* anything else is an error */
-case 8:
-YY_RULE_SETUP
-#line 21 "minscheme.l"
-yyerror("invalid character");
-	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 23 "minscheme.l"
+#line 22 "minscheme.l"
+yyerror("invalid character");
+	YY_BREAK
+case 10:
+YY_RULE_SETUP
+#line 24 "minscheme.l"
 ECHO;
 	YY_BREAK
-#line 810 "minscheme.yy.c"
+#line 815 "minscheme.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1099,7 +1104,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 25 )
+			if ( yy_current_state >= 27 )
 				yy_c = yy_meta[(unsigned int) yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
@@ -1127,11 +1132,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 25 )
+		if ( yy_current_state >= 27 )
 			yy_c = yy_meta[(unsigned int) yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 24);
+	yy_is_jam = (yy_current_state == 26);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1807,7 +1812,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 23 "minscheme.l"
+#line 24 "minscheme.l"
 
 
 
@@ -1816,15 +1821,6 @@ void yyerror(char *s) {
     fprintf(stderr, "%s\n", s);
 }
 
-/*
-%union
-{
-    char*   str_t;
-    int     int_t;
-}
-%type<int_t>    INTEGER IDENTIFIER DISP DEFINE
-[-+()=/*] {   return *yytext; }
-*/
 int yywrap(void) {
     return 1; // 왜 eof에서 1이 반환이 안 되지? 이건 그럼 뭔 의미..
 }

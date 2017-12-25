@@ -171,33 +171,6 @@ bool is_disp_expr(Node* node){
             */
 }
 
-inline static
-bool is_define_expr(Node* node){
-    return true;
-    /*
-    auto* child0 = node->child[0];
-    return (child0 != NULL &&
-            child0->name != NULL &&
-            streq(child0->name, "define"));
-            */
-}
-
-/*
-inline static
-bool is_add2_call(Node* node){
-    assert( car(node) != NULL );
-    //cout << "is add2 ???:" << car(node)->name << '\n';
-    return streq(car(node)->name, "add2"); // it will be replaced to predefined function.
-}
-
-inline static
-bool is_sub2_call(Node* node){
-    assert( car(node) != NULL );
-    //cout << "is add2 ???:" << car(node)->name << '\n';
-    return streq(car(node)->name, "sub2"); // it will be replaced to predefined function.
-}
-*/
-
 static
 bool incorrect_argnum(Node* node, int* ret_argnum)
 {
