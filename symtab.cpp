@@ -18,7 +18,7 @@ unordered_map<string,Entry> symtab =
     { "mul2",   {FUNC,          0ll, 2} },
     { "div2",   {FUNC,          0ll, 2} },
     { "newline",{FUNC,          0ll, 0} },
-    { "=",      {FUNC,          0ll, 0} },
+    { "=",      {FUNC,          0ll, 2} },
 };
 
 // need to clear symtab..

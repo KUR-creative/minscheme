@@ -164,8 +164,8 @@ TEST_CASE_METHOD(IOFixture, "define: id is unbound variable, but no error."){
     set_prog_src("(define newid 12)");
     REQUIRE_THAT( actual(), Equals("") );
 }
-TEST_CASE_METHOD(IOFixture, "define: add new symbol to symtab","[.]"){
-    set_prog_src("(define id1 12)");
+TEST_CASE_METHOD(IOFixture, "define: add new symbol to symtab"){
+    set_prog_src("(define id1 12)",true);
     Value retval = 0;
     Type type;
     int argnum;
@@ -199,34 +199,34 @@ TEST_CASE_METHOD(IOFixture, "if: selection"){
     REQUIRE_THAT( actual(), Equals("1") );
 }
 TEST_CASE_METHOD(IOFixture, "if: selection - false"){
-    set_prog_src("(if #f (disp 1)(disp 0)) ",true);
+    set_prog_src("(if #f (disp 1)(disp 0)) ");
     REQUIRE_THAT( actual(), Equals("0") );
 }
 TEST_CASE_METHOD(IOFixture, "if: condition must be bool type."){
-    set_prog_src("(if 1 (disp 1)(disp 0))",true);
+    set_prog_src("(if 1 (disp 1)(disp 0))");
     REQUIRE_THAT( actual(), Equals(string("if")
                                   +string(type_mismatch_errmsg)) );
 }
 TEST_CASE_METHOD(IOFixture, "if: result can be any type."){
-    set_prog_src("(disp (if #t 1 #f)) (disp (if #f 1 #f))",true);
+    set_prog_src("(disp (if #t 1 #f)) (disp (if #f 1 #f))");
     REQUIRE_THAT( actual(), Equals("1false") );
 }
 TEST_CASE_METHOD(IOFixture, "if: recursive evaluation."){
-    set_prog_src("(disp (if #t (add2 3 4) #f))",true);
+    set_prog_src("(disp (if #t (add2 3 4) #f))");
     REQUIRE_THAT( actual(), Equals("7") );
 }
-TEST_CASE_METHOD(IOFixture, "if: recursive evaluation2.","[.]"){
-    set_prog_src("(disp (if (= 4 4) (add2 3 4) #f))",true);
+TEST_CASE_METHOD(IOFixture, "if: recursive evaluation2."){
+    set_prog_src("(disp (if (= 4 4) (add2 3 4) #f))");
     REQUIRE_THAT( actual(), Equals("7") );
 }
 
 //primitives             
 TEST_CASE_METHOD(IOFixture, "=: int x int -> bool"){
-    set_prog_src("(disp (= 1 1))",true);
+    set_prog_src("(disp (= 1 1))");
     REQUIRE_THAT( actual(), Equals("true") );
 }
 TEST_CASE_METHOD(IOFixture, "bool: #t"){
-    set_prog_src("#t",true);
+    set_prog_src("#t");
     REQUIRE_THAT( actual(), Equals("") );
 }
 TEST_CASE_METHOD(IOFixture, "disp bool: #t"){
@@ -346,4 +346,13 @@ TEST_CASE_METHOD(IOFixture, "critical error aborts the execution","[.]"){
                                   +string(unbound_variable_errmsg)) );
 }
 
-
+// calculation
+TEST_CASE_METHOD(IOFixture, "calculation", "[.]"){
+    set_prog_src("(define a 12)     \
+                  (define b 24)     \
+                  (define c  2)     \
+                  (disp (add2 a b)) \
+                  (newline)         \
+                  (disp (sub2 b c))");
+    REQUIRE_THAT( actual(), Equals("36\n22") );
+}

@@ -175,24 +175,26 @@ void eval_equal(Node* call_expr, Inherit* state){
 }
 
 // car_eval_argnum is useless...!
+// warning: type_check_if must called in eval:
 static
-void type_check_if(Node* call_expr, Inherit* state,int car_eval_argnum){
+void type_check_if(Node* expr, Inherit* state,int car_eval_argnum){
     if(*state != ERROR_STATE){ 
-        if(cadr(call_expr)->type != BOOL_TYPE )// type mismatched!
+        if(cadr(expr)->type != BOOL_TYPE )// type mismatched!
         { 
-            error_report(call_expr, TYPE_MISMATCH, state, car_eval_argnum);
+            error_report(expr, TYPE_MISMATCH, state, car_eval_argnum);
         }
     }
 }
 static
 void eval_if(Node* expr, Inherit* state){
+    auto* _cond = cadr(expr); 
+    auto* _then = caddr(expr); 
+    auto* _else = cadddr(expr); 
+
+    interpret(_cond, SELECTION, LR);
+    type_check_if(expr, state, 1); // cond.type = bool ?
+
     if(*state != ERROR_STATE){ 
-        auto* _cond = cadr(expr); 
-        auto* _then = caddr(expr); 
-        auto* _else = cadddr(expr); 
-
-        interpret(_cond, SELECTION, LR);
-
         if(_cond->value == 1ll){
             interpret(_then,SELECTION,RL);
             expr->value = _then->value;
@@ -204,7 +206,7 @@ void eval_if(Node* expr, Inherit* state){
         }
     }
     del_tree(&car(expr)); del_tree(&cdr(expr));
-    // TODO: 스테이트로 abort하지 말고 del_tree로 abort한다.
+    // TODO: func도 스테이트로 abort하지 말고 if처럼 del_tree로 abort한다.
 }
 
 inline static
@@ -303,7 +305,6 @@ Type interpret(Node* node, Inherit state, PrevEdges prevXX) {
             error_report(node, ILL_FORMED_SPECIAL_FORM, &state);
         }
         //cout << '[' << car_eval_argnum << ']' << endl;
-        type_check_if(node, &state, 1); // cond.type = bool ?
         eval_if(node, &state);
     }
 
@@ -381,112 +382,4 @@ Type interpret(Node* node, Inherit state, PrevEdges prevXX) {
     //cout << '[' << node->name << '|' << state << '|' << prevXX << "] \n"; 
 
     return node->type;
-    /*
-    bool is_func_position = false;
-    Hint car_hint;
-    if( state == DEFINING ){
-        car_hint = safe_interpret(car(node), DEFINING);
-    }else{
-        car_hint = safe_interpret(car(node), CAR_DOWN);
-    }
-
-    if( car_hint == DEFINE_ATOM ){ 
-        state = DEFINING;
-    }
-    else if( state == CAR_DOWN )   // This node is FIRST node of list.
-    {
-        is_func_position = true;
-        if( car_hint == INT_ATOM ){// INT_ATOM is not applicable. 
-            string errmsg = string(car(node)->name) + string(not_applicable_errmsg);
-            fprintf(yyout, "%s", errmsg.c_str());
-        }
-    }
-
-    if( state != DEFINING ){
-        state = CDR_DOWN;
-    }
-    Hint cdr_hint = safe_interpret(cdr(node), state);
-
-    //cout << node->hint << ':' << node->name << '[' 
-         //<< car_hint << ',' << cdr_hint << "]\n";
-    if( node->hint == ID_ATOM ){
-        if( state != DEFINING ){ // if defining, then skip!
-            Value value;
-            Type type;
-            int argnum;
-            auto error_flag = get_from_symtab(node->name, 
-                                              &type, &value, &argnum);
-
-            if(error_flag == UNBOUND_VARIABLE) {
-                string errmsg = string(node->name) 
-                                + string(unbound_variable_errmsg);
-                fprintf(yyout, "%s", errmsg.c_str());
-            }else{
-                node->value = value; //get value from symtab!
-            }
-        }
-    }
-    else if( car_hint == ID_ATOM ){ // 이거 함수 인자 개수 설정 되겠는데?
-        if( is_add2_call(node) ){
-            if( list_len(node) != (1 + 2) ){ // 3: add2, arg1, arg2
-                string errmsg = string(car(node)->name) 
-                                + string(incorrect_argnum_errmsg);
-                fprintf(yyout, "%s", errmsg.c_str());
-            }else{
-                if(is_func_position){
-                    assert(cadr(node) != NULL); // if cadr is null, then..??
-                    assert(caddr(node) != NULL);
-                    auto arg1val = cadr(node)->value; 
-                    auto arg2val = caddr(node)->value; 
-                    // evaluation!: int x int -> int
-                    del_tree(&car(node)); del_tree(&cdr(node));
-                    node->value = arg1val + arg2val;
-                    node->hint = INT_ATOM;
-                }
-            }
-        }
-        else if( is_sub2_call(node) ){ // check name
-            if( list_len(node) != (1 + 2) ){ // 3: add2, arg1, arg2
-                string errmsg = string(car(node)->name) 
-                                + string(incorrect_argnum_errmsg);
-                fprintf(yyout, "%s", errmsg.c_str());
-            }else{
-                if(is_func_position){
-                    assert(cadr(node) != NULL);
-                    assert(caddr(node) != NULL);
-                    auto arg1val = cadr(node)->value; 
-                    auto arg2val = caddr(node)->value; 
-                    // evaluation!: int x int -> int
-                    del_tree(&car(node)); del_tree(&cdr(node));
-                    node->value = arg1val - arg2val;
-                    node->hint = INT_ATOM;
-                }
-            }
-        }
-        else if(is_disp_expr(node)){
-            //cout << '<' << cadr(node)->value << '>';
-            if(is_func_position){
-                fprintf(yyout, "%lld", cadr(node)->value); 
-            }
-        }
-    }
-    else if( car_hint == DEFINE_ATOM && cdr_hint == EXPR_PAIR ){ // list len 뽑는 함수 만들 것.
-        if( is_define_expr(node) ) {
-            auto    name    = cadr(node)->name;
-            Value   value   = caddr(node)->value;
-            Type    type    = caddr(node)->type; 
-            add_to_symtab(name, type, value);
-        }
-    }
-
-    */
 }
-
-        /*
-        if( car_hint != ID_ATOM ){// Only ID_ATOM could be a function.
-            if( car_hint != NO_CHILD ){
-                string errmsg = string(car(node)->name) + string(not_applicable_errmsg);
-                fprintf(yyout, "%s", errmsg.c_str());
-            }
-        }
-        */
