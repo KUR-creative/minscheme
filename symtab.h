@@ -16,9 +16,9 @@ typedef struct Entry {
 
 // return value is error code.
 int get_from_symtab(char* key, Type* rettype, Value* retval, int* ret_argnum); 
-int add_to_symtab(char* key, Type type, Value value); 
+int add_to_symtab(char* key, Type type, Value value, int argnum); 
 //int get_func_from_symtab(char* key, Type* rettype, Value* retval); 
-int add_func_to_symtab(char* key, Value bodyptr, int argnum);
+//int add_func_to_symtab(char* key, Value bodyptr, int argnum);
 
 #ifdef __cplusplus
 }

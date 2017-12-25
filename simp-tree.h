@@ -51,7 +51,7 @@ typedef struct Node {
     Hint            hint;
     Type            type;
     Value           value;
-    //int             argnum; // 최적화..
+    int             argnum; // 최적화..
     struct Node*    child[NUM_CHILD];
 } Node;
 

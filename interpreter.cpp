@@ -209,6 +209,20 @@ void eval_if(Node* expr, Inherit* state){
     // TODO: func도 스테이트로 abort하지 말고 if처럼 del_tree로 abort한다.
 }
 
+static 
+void eval_define(Node* expr, Inherit* state){ // li0 = define
+    // case 1: (define id value) 
+    if( cadr(expr)->hint == ID_ATOM     &&
+        caddr(expr)->hint != EXPR_PAIR  &&
+        caddr(expr)->hint != END_PAIR)
+    {
+        auto type   = caddr(expr)->type;
+        auto value  = caddr(expr)->value;
+        auto argnum = caddr(expr)->argnum;
+        add_to_symtab(cadr(expr)->name, type, value, argnum);
+    }
+}
+
 inline static
 bool streq(char* s1, char* s2){
     return (strcmp(s1, s2) == 0);
@@ -298,6 +312,7 @@ Type interpret(Node* node, Inherit state, PrevEdges prevXX) {
         if( incorrect_argnum(node, &car_eval_argnum) ) { 
             error_report(node, ILL_FORMED_SPECIAL_FORM, &state);
         }
+        eval_define(node, &state);
     }
     else if( car_type == IF_TYPE ){
         state = SELECTION;

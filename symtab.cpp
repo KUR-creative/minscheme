@@ -38,8 +38,8 @@ int get_from_symtab(char* identifier,
 }    
 
 // need to entry structure...
-int add_to_symtab(char* identifier, Type type, Value value)
+int add_to_symtab(char* identifier, Type type, Value value, int argnum)
 {
-    assert(type != FUNC && "use add_func_to_symtab instead."); //
+    //assert(type != FUNC && "use add_func_to_symtab instead."); //
     symtab[string(identifier)] = {type,value};
 }

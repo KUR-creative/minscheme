@@ -164,6 +164,10 @@ TEST_CASE_METHOD(IOFixture, "define: id is unbound variable, but no error."){
     set_prog_src("(define newid 12)");
     REQUIRE_THAT( actual(), Equals("") );
 }
+TEST_CASE_METHOD(IOFixture, "define: function"){
+    set_prog_src("(define (func a b) (+ a b))", true);
+    REQUIRE_THAT( actual(), Equals("") );
+}
 TEST_CASE_METHOD(IOFixture, "define: add new symbol to symtab"){
     set_prog_src("(define id1 12)",true);
     Value retval = 0;
@@ -347,7 +351,7 @@ TEST_CASE_METHOD(IOFixture, "critical error aborts the execution","[.]"){
 }
 
 // calculation
-TEST_CASE_METHOD(IOFixture, "calculation", "[.]"){
+TEST_CASE_METHOD(IOFixture, "calculation"){
     set_prog_src("(define a 12)     \
                   (define b 24)     \
                   (define c  2)     \
