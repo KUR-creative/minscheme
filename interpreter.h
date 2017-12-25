@@ -14,6 +14,7 @@ typedef enum Inherit {
     FUNC_CALL,
     ERROR_STATE,
     DEFINING,
+    SELECTION,
 } Inherit;
 
 Type interpret(Node* parse_tree, Inherit state, PrevEdges prevs);

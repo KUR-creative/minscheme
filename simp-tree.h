@@ -8,6 +8,7 @@
 #define car(p) ((p)->child[0])  // list[0]
 #define cadr(p) ((p)->child[1]->child[0]) // list[1]
 #define caddr(p) ((p)->child[1]->child[1]->child[0]) // list[2]
+#define cadddr(p) ((p)->child[1]->child[1]->child[1]->child[0]) // list[3]
 #define cdr(p) ((p)->child[1])  // unsafe!
 
 typedef long long Value;

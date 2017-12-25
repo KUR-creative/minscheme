@@ -152,23 +152,64 @@ void eval_newline(Node* call_expr, Inherit* state){
     }
 }
 
+static
+void type_check_equal(Node* call_expr, Inherit* state,int car_eval_argnum){
+    if(*state != ERROR_STATE){ 
+        if(cadr(call_expr)->type != INT ||
+           caddr(call_expr)->type != INT )// type mismatched!
+        { 
+            error_report(call_expr, TYPE_MISMATCH, state, car_eval_argnum);
+        }
+    }
+}
+
+static
+void eval_equal(Node* call_expr, Inherit* state){
+    if(*state != ERROR_STATE){ 
+        auto arg1val = cadr(call_expr)->value; 
+        auto arg2val = caddr(call_expr)->value; 
+        del_tree(&car(call_expr)); del_tree(&cdr(call_expr));
+        call_expr->value = (arg1val == arg2val);
+        call_expr->type = BOOL_TYPE;
+    }
+}
+
+// car_eval_argnum is useless...!
+static
+void type_check_if(Node* call_expr, Inherit* state,int car_eval_argnum){
+    if(*state != ERROR_STATE){ 
+        if(cadr(call_expr)->type != BOOL_TYPE )// type mismatched!
+        { 
+            error_report(call_expr, TYPE_MISMATCH, state, car_eval_argnum);
+        }
+    }
+}
+static
+void eval_if(Node* expr, Inherit* state){
+    if(*state != ERROR_STATE){ 
+        auto* _cond = cadr(expr); 
+        auto* _then = caddr(expr); 
+        auto* _else = cadddr(expr); 
+
+        interpret(_cond, SELECTION, LR);
+
+        if(_cond->value == 1ll){
+            interpret(_then,SELECTION,RL);
+            expr->value = _then->value;
+            expr->type = _then->type;
+        }else{
+            interpret(_else,SELECTION,RL);
+            expr->value = _else->value;
+            expr->type = _else->type;
+        }
+    }
+    del_tree(&car(expr)); del_tree(&cdr(expr));
+    // TODO: 스테이트로 abort하지 말고 del_tree로 abort한다.
+}
 
 inline static
 bool streq(char* s1, char* s2){
     return (strcmp(s1, s2) == 0);
-}
-
-inline static
-bool is_disp_expr(Node* node){
-    assert( car(node) != NULL );
-    //cout << "isdisp???:" << car(node)->name << '\n';
-    return streq(car(node)->name, "disp"); // it will be replaced to predefined function.
-    /*
-    auto* child0 = node->child[0];
-    return (child0 != NULL &&
-            child0->name != NULL &&
-            streq(child0->name, "disp"));
-            */
 }
 
 static
@@ -194,11 +235,13 @@ void error_report(Node* node, ErrorKind kind, Inherit* state, int argnum)
         return;
         }
     case TYPE_MISMATCH:{
-        string errmsg = string("(") 
-                        + string(car(node)->name)
-                        + string(" ")
-                        + string(cadr(node)->name)
-                        + string(")")
+        //string errmsg = string("(") 
+                        //+ string(car(node)->name)
+                        //+ string(" ")
+                        //+ string(cadr(node)->name)
+                        //+ string(")")
+                        //+ string(type_mismatch_errmsg);
+        string errmsg = string(car(node)->name) 
                         + string(type_mismatch_errmsg);
         fprintf(yyout, "%s", errmsg.c_str());
         *state = ERROR_STATE;
@@ -211,8 +254,8 @@ void error_report(Node* node, ErrorKind kind, Inherit* state, int argnum)
         return;
         }
     case ILL_FORMED_SPECIAL_FORM:{//TODO: generalize!
-        string errmsg = string("(define newid 12 43)")
-                        +string(ill_formed_special_form_errmsg);
+        string errmsg = string(car(node)->name) 
+                        + string(ill_formed_special_form_errmsg);
         fprintf(yyout, "%s", errmsg.c_str());
         return;
         }
@@ -254,12 +297,24 @@ Type interpret(Node* node, Inherit state, PrevEdges prevXX) {
             error_report(node, ILL_FORMED_SPECIAL_FORM, &state);
         }
     }
+    else if( car_type == IF_TYPE ){
+        state = SELECTION;
+        if( incorrect_argnum(node, &car_eval_argnum) ) { 
+            error_report(node, ILL_FORMED_SPECIAL_FORM, &state);
+        }
+        //cout << '[' << car_eval_argnum << ']' << endl;
+        type_check_if(node, &state, 1); // cond.type = bool ?
+        eval_if(node, &state);
+    }
 
     Type cdr_type = NULL_NODE;
     if( cdr(node) != NULL ){
         // TODO: refactor?
         Inherit next_state;
-        if(state == TOP_LIST || state == DEFINING){
+        if( state == TOP_LIST || 
+            state == DEFINING ||
+            state == SELECTION)
+        {
             next_state = state;
         }
         else{
@@ -299,6 +354,10 @@ Type interpret(Node* node, Inherit state, PrevEdges prevXX) {
         else if(streq(func_name,"newline")){
             //type_check_newline(node, &state, car_eval_argnum);
             eval_newline(node, &state);
+        }
+        else if(streq(func_name,"=")){
+            type_check_equal(node, &state, car_eval_argnum);
+            eval_equal(node, &state);
         }
     }
 

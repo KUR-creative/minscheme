@@ -10,13 +10,15 @@ using std::string;
 
 unordered_map<string,Entry> symtab = 
 {
-    { "define",{DEFINE_TYPE, 1ll, 2} }, // special form: 1ll
-    { "disp", {FUNC, 0ll, 1} },  // primitive func has NULL body ptr.
-    { "add2", {FUNC, 0ll, 2} }, 
-    { "sub2", {FUNC, 0ll, 2} },
-    { "mul2", {FUNC, 0ll, 2} },
-    { "div2", {FUNC, 0ll, 2} },
-    { "newline", {FUNC, 0ll, 0} },
+    { "define", {DEFINE_TYPE,   1ll, 2} }, // special form: 1ll
+    { "if",     {IF_TYPE,       1ll, 3} }, // special form: 1ll
+    { "disp",   {FUNC,          0ll, 1} },  // primitive func has NULL body ptr.
+    { "add2",   {FUNC,          0ll, 2} }, 
+    { "sub2",   {FUNC,          0ll, 2} },
+    { "mul2",   {FUNC,          0ll, 2} },
+    { "div2",   {FUNC,          0ll, 2} },
+    { "newline",{FUNC,          0ll, 0} },
+    { "=",      {FUNC,          0ll, 0} },
 };
 
 // need to clear symtab..

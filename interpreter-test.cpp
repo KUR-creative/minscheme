@@ -156,7 +156,7 @@ TEST_CASE_METHOD(IOFixture, "unbound variable error2"){
 */
 TEST_CASE_METHOD(IOFixture, "define: must be used with 2 expressions."){
     set_prog_src("(define newid 12 43)");
-    REQUIRE_THAT( actual(), Equals(string("(define newid 12 43)")
+    REQUIRE_THAT( actual(), Equals(string("define")
                                   +string(ill_formed_special_form_errmsg)));
 }
 
@@ -193,18 +193,44 @@ TEST_CASE_METHOD(IOFixture, "define: is type saved in symtab correctly?","[.]"){
 }
 
 
+//(if #f (disp 1)(disp 0))
 TEST_CASE_METHOD(IOFixture, "if: selection"){
-    set_prog_src("(if #t (disp 1)(disp 0)) (if #f (disp 1)(disp 0))",true);
-    REQUIRE_THAT( actual(), Equals("10") );
+    set_prog_src("(if #t (disp 1)(disp 0)) ");
+    REQUIRE_THAT( actual(), Equals("1") );
+}
+TEST_CASE_METHOD(IOFixture, "if: selection - false"){
+    set_prog_src("(if #f (disp 1)(disp 0)) ",true);
+    REQUIRE_THAT( actual(), Equals("0") );
+}
+TEST_CASE_METHOD(IOFixture, "if: condition must be bool type."){
+    set_prog_src("(if 1 (disp 1)(disp 0))",true);
+    REQUIRE_THAT( actual(), Equals(string("if")
+                                  +string(type_mismatch_errmsg)) );
+}
+TEST_CASE_METHOD(IOFixture, "if: result can be any type."){
+    set_prog_src("(disp (if #t 1 #f)) (disp (if #f 1 #f))",true);
+    REQUIRE_THAT( actual(), Equals("1false") );
+}
+TEST_CASE_METHOD(IOFixture, "if: recursive evaluation."){
+    set_prog_src("(disp (if #t (add2 3 4) #f))",true);
+    REQUIRE_THAT( actual(), Equals("7") );
+}
+TEST_CASE_METHOD(IOFixture, "if: recursive evaluation2.","[.]"){
+    set_prog_src("(disp (if (= 4 4) (add2 3 4) #f))",true);
+    REQUIRE_THAT( actual(), Equals("7") );
 }
 
 //primitives             
+TEST_CASE_METHOD(IOFixture, "=: int x int -> bool"){
+    set_prog_src("(disp (= 1 1))",true);
+    REQUIRE_THAT( actual(), Equals("true") );
+}
 TEST_CASE_METHOD(IOFixture, "bool: #t"){
     set_prog_src("#t",true);
     REQUIRE_THAT( actual(), Equals("") );
 }
 TEST_CASE_METHOD(IOFixture, "disp bool: #t"){
-    set_prog_src("(disp #t)(newline)(disp #f)",true);
+    set_prog_src("(disp #t)(newline)(disp #f)");
     REQUIRE_THAT( actual(), Equals("true\nfalse") );
 }
 TEST_CASE_METHOD(IOFixture, "=2: ","[.]"){
