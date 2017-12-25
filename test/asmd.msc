@@ -1,0 +1,4 @@
+(disp (add2 10 2))
+(newline)
+(disp (sub2 10 2))
+(newline)
