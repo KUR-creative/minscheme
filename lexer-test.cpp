@@ -131,4 +131,34 @@ SCENARIO("identifier"){
         finish_yyin_to_eof();
         del_mockfile(mockfile);
     }
+    SECTION("bool"){
+        char    tmpstr[]= "#t #f";
+        FILE*   mockfile= new_mockfile(tmpstr);
+
+        yyin = mockfile;
+        REQUIRE(yylex() == BOOL);
+        REQUIRE(yylex() == BOOL);
+
+        finish_yyin_to_eof();
+        del_mockfile(mockfile);
+    }
+
+    /*
+    SECTION("if"){
+        char    tmpstr[]= "(if (= 1 1) 1 2)";
+        FILE*   mockfile= new_mockfile(tmpstr);
+
+        yyin = mockfile;
+        REQUIRE(yylex() == '(');
+        REQUIRE(yylex() == IF);
+        REQUIRE(yylex() == '(');
+        REQUIRE(yylex() == IDENTIFIER);
+        REQUIRE(yylex() == INTEGER);
+        REQUIRE(yylex() == INTEGER);
+
+        finish_yyin_to_eof();
+        del_mockfile(mockfile);
+    }
+    */
+
 } 

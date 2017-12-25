@@ -1,4 +1,4 @@
-%token INTEGER IDENTIFIER DISP DEFINE
+%token INTEGER IDENTIFIER DISP DEFINE BOOL
 
 %{
     #include <stdio.h>

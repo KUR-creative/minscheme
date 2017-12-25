@@ -48,7 +48,8 @@ extern int yydebug;
     INTEGER = 258,
     IDENTIFIER = 259,
     DISP = 260,
-    DEFINE = 261
+    DEFINE = 261,
+    BOOL = 262
   };
 #endif
 
@@ -62,7 +63,7 @@ union YYSTYPE
     struct Node*    node_t;
     int             int_t;
 
-#line 66 "minscheme.tab.h" /* yacc.c:1909  */
+#line 67 "minscheme.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

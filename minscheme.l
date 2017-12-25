@@ -8,6 +8,7 @@
     
 "disp"                  { return DISP; }
 "define"                { return DEFINE; }
+("#t"|"#f")             { return BOOL; }
     
 [-+]?[0-9]+             { return INTEGER; }
 [_a-zA-Z0-9?!+-/*=]+    { return IDENTIFIER; }
