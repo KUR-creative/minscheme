@@ -192,6 +192,12 @@ TEST_CASE_METHOD(IOFixture, "define: is type saved in symtab correctly?","[.]"){
     REQUIRE(type == INT);
 }
 
+
+TEST_CASE_METHOD(IOFixture, "if: selection"){
+    set_prog_src("(if #t (disp 1)) (if #f (disp 0))",true);
+    REQUIRE_THAT( actual(), Equals("") );
+}
+
 //primitives             
 TEST_CASE_METHOD(IOFixture, "bool: #t"){
     set_prog_src("#t",true);

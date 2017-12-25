@@ -24,6 +24,7 @@ typedef enum PrevEdges { // L: car, R: cdr.
 typedef enum Hint { // it is NOT the type of data!
     NO_CHILD,   //0
     DEFINE_ATOM,
+    IF_ATOM,
     INT_ATOM,
     ID_ATOM,
     BOOL_ATOM,
@@ -39,6 +40,7 @@ typedef enum Type{
     EXPR_LIST,
     DISP_NODE,
     DEFINE_TYPE,
+    IF_TYPE,
     BOOL_TYPE,
     NULL_NODE,
 } Type;

@@ -25,13 +25,13 @@ stt: # simp-tree test
 	g++ -std=c++11 -o simp-tree-test simp-tree-test.o $(OBJS)
 	./simp-tree-test
 
-it: # interpreter test
+t: # interpreter test
 	make compile
 	make interpreter-test.o
 	g++ -std=c++11 -o interpreter-test interpreter-test.o $(OBJS)
 	./interpreter-test
 
-t: # lexer test
+lt: # lexer test
 	make compile
 	g++ -std=c++11 -o lexer-test lexer-test.cpp $(OBJS)
 	./lexer-test
@@ -82,8 +82,7 @@ t1: $(NAME).l $(NAME).y
 	#$(CC) -o $(NAME) $(NAME).tab.o $(NAME).yy.o simp-tree.o
 
 clean:
-	rm cal cal.output cal.tab.c cal.tab.h cal.tab.o cal.yy.c cal.yy.o\
-	 simp-tree.h.gch 
+	rm $(OBJS)
 
 ctags:
 	rm tags
