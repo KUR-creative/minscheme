@@ -1,8 +1,3 @@
-Terminals unused in grammar
-
-   IF
-
-
 Grammar
 
     0 $accept: prog $end
@@ -15,9 +10,10 @@ Grammar
     5     | DISP
     6     | DEFINE
     7     | BOOL
+    8     | IF
 
-    8 pair: expr
-    9     | expr pair
+    9 pair: expr
+   10     | expr pair
 
 
 Terminals, with rules where they appear
@@ -31,7 +27,7 @@ IDENTIFIER (259) 4
 DISP (260) 5
 DEFINE (261) 6
 BOOL (262) 7
-IF (263)
+IF (263) 8
 
 
 Nonterminals, with rules where they appear
@@ -41,9 +37,9 @@ $accept (11)
 prog (12)
     on left: 1, on right: 0
 expr (13)
-    on left: 2 3 4 5 6 7, on right: 8 9
+    on left: 2 3 4 5 6 7 8, on right: 9 10
 pair (14)
-    on left: 8 9, on right: 1 2 9
+    on left: 9 10, on right: 1 2 10
 
 
 State 0
@@ -55,11 +51,12 @@ State 0
     DISP        shift, and go to state 3
     DEFINE      shift, and go to state 4
     BOOL        shift, and go to state 5
-    '('         shift, and go to state 6
+    IF          shift, and go to state 6
+    '('         shift, and go to state 7
 
-    prog  go to state 7
-    expr  go to state 8
-    pair  go to state 9
+    prog  go to state 8
+    expr  go to state 9
+    pair  go to state 10
 
 
 State 1
@@ -99,6 +96,13 @@ State 5
 
 State 6
 
+    8 expr: IF .
+
+    $default  reduce using rule 8 (expr)
+
+
+State 7
+
     2 expr: '(' . pair ')'
 
     INTEGER     shift, and go to state 1
@@ -106,66 +110,68 @@ State 6
     DISP        shift, and go to state 3
     DEFINE      shift, and go to state 4
     BOOL        shift, and go to state 5
-    '('         shift, and go to state 6
+    IF          shift, and go to state 6
+    '('         shift, and go to state 7
 
-    expr  go to state 8
-    pair  go to state 10
-
-
-State 7
-
-    0 $accept: prog . $end
-
-    $end  shift, and go to state 11
+    expr  go to state 9
+    pair  go to state 11
 
 
 State 8
 
-    8 pair: expr .
-    9     | expr . pair
+    0 $accept: prog . $end
+
+    $end  shift, and go to state 12
+
+
+State 9
+
+    9 pair: expr .
+   10     | expr . pair
 
     INTEGER     shift, and go to state 1
     IDENTIFIER  shift, and go to state 2
     DISP        shift, and go to state 3
     DEFINE      shift, and go to state 4
     BOOL        shift, and go to state 5
-    '('         shift, and go to state 6
+    IF          shift, and go to state 6
+    '('         shift, and go to state 7
 
-    $default  reduce using rule 8 (pair)
+    $default  reduce using rule 9 (pair)
 
-    expr  go to state 8
-    pair  go to state 12
+    expr  go to state 9
+    pair  go to state 13
 
 
-State 9
+State 10
 
     1 prog: pair .
 
     $default  reduce using rule 1 (prog)
 
 
-State 10
+State 11
 
     2 expr: '(' pair . ')'
 
-    ')'  shift, and go to state 13
+    ')'  shift, and go to state 14
 
 
-State 11
+State 12
 
     0 $accept: prog $end .
 
     $default  accept
 
 
-State 12
-
-    9 pair: expr pair .
-
-    $default  reduce using rule 9 (pair)
-
-
 State 13
+
+   10 pair: expr pair .
+
+    $default  reduce using rule 10 (pair)
+
+
+State 14
 
     2 expr: '(' pair ')' .
 

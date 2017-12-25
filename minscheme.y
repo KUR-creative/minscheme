@@ -28,7 +28,7 @@
     int             int_t;
 }
 
-%type<int_t>    INTEGER IDENTIFIER DISP DEFINE BOOL
+%type<int_t>    INTEGER IDENTIFIER DISP DEFINE BOOL IF
 %type<node_t>   expr pair
 
 %%
@@ -46,6 +46,7 @@ expr:
     |   DEFINE          { $$ = atom("define", DEFINE_TYPE, UNKNOWN_VAL, DEFINE_ATOM); }
     |   BOOL            { long long val = ((yytext[1] == 't') ? 1 : 0);
                           $$ = atom(yytext, BOOL_TYPE, val, BOOL_ATOM); }
+    |   IF              { $$ = atom("if", IF_TYPE, UNKNOWN_VAL, IF_ATOM); }
     ;
 
 pair:
