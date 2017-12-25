@@ -26,6 +26,7 @@ typedef enum Hint { // it is NOT the type of data!
     DEFINE_ATOM,
     INT_ATOM,
     ID_ATOM,
+    BOOL_ATOM,
     END_PAIR, // pair: [car,nil]
     EXPR_PAIR,// pair: [car,cdr]
 } Hint;
@@ -38,6 +39,7 @@ typedef enum Type{
     EXPR_LIST,
     DISP_NODE,
     DEFINE_TYPE,
+    BOOL_TYPE,
     NULL_NODE,
 } Type;
 

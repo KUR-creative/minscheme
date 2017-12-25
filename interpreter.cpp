@@ -120,7 +120,9 @@ void eval_div2(Node* call_expr, Inherit* state){
 static 
 void type_check_disp(Node* call_expr, Inherit* state, int car_eval_argnum){
     if(*state != ERROR_STATE){ 
-        if(cadr(call_expr)->type != INT){ // type mismatched!
+        if( cadr(call_expr)->type == INT ||
+            cadr(call_expr)->type == BOOL_TYPE){ // type matched!
+        }else{
             error_report(call_expr, TYPE_MISMATCH, state, car_eval_argnum);
         }
     }
@@ -128,7 +130,15 @@ void type_check_disp(Node* call_expr, Inherit* state, int car_eval_argnum){
 static 
 void eval_disp(Node* call_expr, Inherit* state){
     if(*state != ERROR_STATE){ 
-        fprintf(yyout, "%lld", cadr(call_expr)->value); 
+        if( cadr(call_expr)->type == INT){
+            fprintf(yyout, "%lld", cadr(call_expr)->value); 
+        }else if( cadr(call_expr)->type == BOOL_TYPE){ 
+            if(cadr(call_expr)->value == 0){
+                fprintf(yyout, "false");
+            }else{
+                fprintf(yyout, "true");
+            }
+        }
     }
 }
 

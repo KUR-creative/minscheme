@@ -193,9 +193,13 @@ TEST_CASE_METHOD(IOFixture, "define: is type saved in symtab correctly?","[.]"){
 }
 
 //primitives             
-TEST_CASE_METHOD(IOFixture, "bool: #t", "[.]"){
+TEST_CASE_METHOD(IOFixture, "bool: #t"){
     set_prog_src("#t",true);
     REQUIRE_THAT( actual(), Equals("") );
+}
+TEST_CASE_METHOD(IOFixture, "disp bool: #t"){
+    set_prog_src("(disp #t)(newline)(disp #f)",true);
+    REQUIRE_THAT( actual(), Equals("true\nfalse") );
 }
 TEST_CASE_METHOD(IOFixture, "=2: ","[.]"){
     set_prog_src("");

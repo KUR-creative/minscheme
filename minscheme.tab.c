@@ -394,18 +394,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  10
+#define YYFINAL  11
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   9
+#define YYLAST   10
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  10
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  9
+#define YYNRULES  10
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  13
+#define YYNSTATES  14
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -452,7 +452,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    37,    37,    41,    42,    44,    45,    46,    50,    53
+       0,    37,    37,    41,    42,    44,    45,    46,    47,    52,
+      55
 };
 #endif
 
@@ -489,8 +490,8 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -4,    -4,    -4,    -4,    -3,     7,    -3,    -4,     0,
-      -4,    -4,    -4
+      -3,    -4,    -4,    -4,    -4,    -4,    -3,     7,    -3,    -4,
+       1,    -4,    -4,    -4
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -498,20 +499,20 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     4,     5,     6,     7,     0,     0,     8,     2,     0,
-       1,     9,     3
+       0,     4,     5,     6,     7,     8,     0,     0,     9,     2,
+       0,     1,    10,     3
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -4,    -4,    -4,    -1
+      -4,    -4,    -4,     0
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     6,     7,     8
+      -1,     7,     8,     9
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -519,32 +520,36 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-       1,     2,     3,     4,     9,     5,    11,    10,     0,    12
+       1,     2,     3,     4,     5,     6,    10,    11,    12,     0,
+      13
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     4,     5,     6,     5,     8,     7,     0,    -1,     9
+       3,     4,     5,     6,     7,     8,     6,     0,     8,    -1,
+       9
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,     4,     5,     6,     8,    11,    12,    13,    13,
-       0,    13,     9
+       0,     3,     4,     5,     6,     7,     8,    11,    12,    13,
+      13,     0,    13,     9
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    10,    11,    12,    12,    12,    12,    12,    13,    13
+       0,    10,    11,    12,    12,    12,    12,    12,    12,    13,
+      13
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     3,     1,     1,     1,     1,     1,     2
+       0,     2,     1,     3,     1,     1,     1,     1,     1,     1,
+       2
 };
 
 
@@ -1223,58 +1228,65 @@ yyreduce:
         case 2:
 #line 37 "minscheme.y" /* yacc.c:1646  */
     { syntax_tree = (yyvsp[0].node_t); }
-#line 1227 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1232 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
 #line 41 "minscheme.y" /* yacc.c:1646  */
     { (yyval.node_t) = (yyvsp[-1].node_t); }
-#line 1233 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1238 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
 #line 42 "minscheme.y" /* yacc.c:1646  */
     { long long val = strtoll(yytext, NULL, 10);
                           (yyval.node_t) = atom(yytext, INT, val, INT_ATOM); }
-#line 1240 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1245 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
 #line 44 "minscheme.y" /* yacc.c:1646  */
     { (yyval.node_t) = atom(yytext, GENERIC, UNKNOWN_VAL, ID_ATOM); }
-#line 1246 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1251 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
 #line 45 "minscheme.y" /* yacc.c:1646  */
     { (yyval.node_t) = atom("disp", FUNC, UNKNOWN_VAL, ID_ATOM); }
-#line 1252 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1257 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
 #line 46 "minscheme.y" /* yacc.c:1646  */
     { (yyval.node_t) = atom("define", DEFINE_TYPE, UNKNOWN_VAL, DEFINE_ATOM); }
-#line 1258 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1263 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 50 "minscheme.y" /* yacc.c:1646  */
-    { (yyval.node_t) = pair("end-pair", GENERIC, UNKNOWN_VAL, END_PAIR, 
-                                    (yyvsp[0].node_t), NULL);// NO_NAME 
-                        }
-#line 1266 "minscheme.tab.c" /* yacc.c:1646  */
+#line 47 "minscheme.y" /* yacc.c:1646  */
+    { long long val = ((yytext[1] == 't') ? 1 : 0);
+                          (yyval.node_t) = atom(yytext, BOOL_TYPE, val, BOOL_ATOM); }
+#line 1270 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 53 "minscheme.y" /* yacc.c:1646  */
+#line 52 "minscheme.y" /* yacc.c:1646  */
+    { (yyval.node_t) = pair("end-pair", GENERIC, UNKNOWN_VAL, END_PAIR, 
+                                    (yyvsp[0].node_t), NULL);// NO_NAME 
+                        }
+#line 1278 "minscheme.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 10:
+#line 55 "minscheme.y" /* yacc.c:1646  */
     { (yyval.node_t) = pair("pair", GENERIC, UNKNOWN_VAL, EXPR_PAIR,
                                     (yyvsp[-1].node_t), (yyvsp[0].node_t)); // NO_NAME
                         }
-#line 1274 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1286 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1278 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1290 "minscheme.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1502,7 +1514,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 58 "minscheme.y" /* yacc.c:1906  */
+#line 60 "minscheme.y" /* yacc.c:1906  */
 
 
 /*

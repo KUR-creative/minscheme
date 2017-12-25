@@ -28,7 +28,7 @@
     int             int_t;
 }
 
-%type<int_t>    INTEGER IDENTIFIER DISP DEFINE
+%type<int_t>    INTEGER IDENTIFIER DISP DEFINE BOOL
 %type<node_t>   expr pair
 
 %%
@@ -44,6 +44,8 @@ expr:
     |   IDENTIFIER      { $$ = atom(yytext, GENERIC, UNKNOWN_VAL, ID_ATOM); }
     |   DISP            { $$ = atom("disp", FUNC, UNKNOWN_VAL, ID_ATOM); }
     |   DEFINE          { $$ = atom("define", DEFINE_TYPE, UNKNOWN_VAL, DEFINE_ATOM); }
+    |   BOOL            { long long val = ((yytext[1] == 't') ? 1 : 0);
+                          $$ = atom(yytext, BOOL_TYPE, val, BOOL_ATOM); }
     ;
 
 pair:
