@@ -164,10 +164,7 @@ TEST_CASE_METHOD(IOFixture, "define: id is unbound variable, but no error."){
     set_prog_src("(define newid 12)");
     REQUIRE_THAT( actual(), Equals("") );
 }
-TEST_CASE_METHOD(IOFixture, "define: function"){
-    set_prog_src("(define (func a b) (+ a b))", true);
-    REQUIRE_THAT( actual(), Equals("") );
-}
+
 TEST_CASE_METHOD(IOFixture, "define: add new symbol to symtab"){
     set_prog_src("(define id1 12)",true);
     Value retval = 0;
@@ -176,7 +173,7 @@ TEST_CASE_METHOD(IOFixture, "define: add new symbol to symtab"){
     get_from_symtab("id1", &type, &retval, &argnum);
     REQUIRE(retval == 12);
 }
-TEST_CASE_METHOD(IOFixture, "define: enviroment, and use id","[.]"){
+TEST_CASE_METHOD(IOFixture, "define: enviroment, and use id"){
     set_prog_src("(define identifier 846)(disp identifier)");
 
     REQUIRE_THAT( actual(), Equals("846") );
@@ -187,7 +184,7 @@ TEST_CASE_METHOD(IOFixture, "define: enviroment, and use id","[.]"){
     get_from_symtab("identifier", &type, &retval, &argnum);
     REQUIRE(retval == 846);
 }
-TEST_CASE_METHOD(IOFixture, "define: is type saved in symtab correctly?","[.]"){
+TEST_CASE_METHOD(IOFixture, "define: is type saved in symtab correctly?"){
     set_prog_src("(define newid 12)");
     Value retval = 0;
     Type type;
@@ -196,6 +193,43 @@ TEST_CASE_METHOD(IOFixture, "define: is type saved in symtab correctly?","[.]"){
     REQUIRE(type == INT);
 }
 
+TEST_CASE_METHOD(IOFixture, "caadr"){
+    set_prog_src("(define (func a b) (add2 a b))");
+    auto def_expr = car(syntax_tree);
+    REQUIRE_THAT( car(def_expr)->name, Equals("define") );
+    REQUIRE_THAT( caadr(def_expr)->name, Equals("func") );
+}
+
+// why don't eval.. ?
+TEST_CASE_METHOD(IOFixture, "define: function"){
+    set_prog_src("(define (func a b) (add2 a b))", true);
+    pretty_print(syntax_tree,0);
+    Value retval = 0;
+    Type type;
+    int argnum;
+    auto err = get_from_symtab("func", &type, &retval, &argnum);
+    REQUIRE( err != UNBOUND_VARIABLE );
+    REQUIRE( type == FUNC );
+    REQUIRE( argnum == 2 );
+    auto* body_ptr = (Node*)retval;
+    REQUIRE_THAT( car(body_ptr)->name , Equals("add2")); 
+}
+TEST_CASE_METHOD(IOFixture, "define: function, and call"){
+    set_prog_src("(define (func a b) (add2 a b)) (disp (func 3 4))", true);
+    pretty_print(syntax_tree,0);
+    auto err = get_from_symtab("func", NULL, NULL, NULL);
+    REQUIRE( err != UNBOUND_VARIABLE );
+    REQUIRE_THAT( actual(), Equals("7") );
+}
+// 모든 arg의 이름이 다른가?
+// arg로 다른 스페셜폼을 쓰지는 않았나?
+// 등등... 예외는 많다..
+//
+TEST_CASE_METHOD(IOFixture, "copy tree"){
+    set_prog_src("(disp (func 3 4))", true);
+    auto* copyed = copy_tree(syntax_tree);
+    pretty_print(copyed,0);
+}
 
 //(if #f (disp 1)(disp 0))
 TEST_CASE_METHOD(IOFixture, "if: selection"){
@@ -236,10 +270,6 @@ TEST_CASE_METHOD(IOFixture, "bool: #t"){
 TEST_CASE_METHOD(IOFixture, "disp bool: #t"){
     set_prog_src("(disp #t)(newline)(disp #f)");
     REQUIRE_THAT( actual(), Equals("true\nfalse") );
-}
-TEST_CASE_METHOD(IOFixture, "=2: ","[.]"){
-    set_prog_src("");
-    REQUIRE_THAT( actual(), Equals("") );
 }
 
 TEST_CASE_METHOD(IOFixture, "add2 = arg1 + arg2"){

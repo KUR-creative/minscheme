@@ -167,3 +167,14 @@ PrevEdges push_cdr(PrevEdges edges)
     }
 }
 
+Node*   copy_tree(Node* tree)
+{
+    Node* ret_tree = new_node2(NULL, NULL, tree->name);
+    ret_tree->hint = tree->hint;
+    ret_tree->type = tree->type;
+    ret_tree->value = tree->value;
+    ret_tree->argnum = tree->argnum;
+    car(ret_tree) = copy_tree(car(tree));
+    cdr(ret_tree) = copy_tree(cdr(tree));
+    return ret_tree;
+}

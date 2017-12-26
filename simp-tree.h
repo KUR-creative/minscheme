@@ -10,6 +10,7 @@
 #define caddr(p) ((p)->child[1]->child[1]->child[0]) // list[2]
 #define cadddr(p) ((p)->child[1]->child[1]->child[1]->child[0]) // list[3]
 #define cdr(p) ((p)->child[1])  // unsafe!
+#define caadr(p) ((p)->child[1]->child[0]->child[0]) 
 
 typedef long long Value;
 extern const Value UNKNOWN_VAL; // UNKNOWN_VALUE is conflict with yacc! 
@@ -71,4 +72,7 @@ int     list_len(Node* list);
 
 PrevEdges push_car(PrevEdges edges);
 PrevEdges push_cdr(PrevEdges edges);
+
+Node*   copy_tree(Node* tree);
 #endif
+

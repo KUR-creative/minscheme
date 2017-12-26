@@ -221,6 +221,18 @@ void eval_define(Node* expr, Inherit* state){ // li0 = define
         auto argnum = caddr(expr)->argnum;
         add_to_symtab(cadr(expr)->name, type, value, argnum);
     }
+    else if(cadr(expr)->hint == EXPR_PAIR){ // case 2: function.
+        Node* prototype = cadr(expr);
+        char* func_name = car(prototype)->name;
+        Node* body_ptr = caddr(expr);
+        auto  argnum = list_len(prototype) - 1;// 2?
+        add_to_symtab(func_name, FUNC, (long long)body_ptr, argnum);
+        //cout << '[' << car(body_ptr)->name <<']' <<  endl;
+        //cout << argnum <<  endl;
+    }
+    else{
+        // type mismatched.. ill_formed_special_form...
+    }
 }
 
 inline static
@@ -346,34 +358,48 @@ Type interpret(Node* node, Inherit state, PrevEdges prevXX) {
     // type은 evaluation이 끝나고 나온다...
     // 이 시점에서 함수 호출의 길이는 이미 체크되어 있음.
     if( car_type == FUNC ){ 
-        char* func_name = car(node)->name;
-        if(streq(func_name,"disp")){
-            type_check_disp(node, &state, car_eval_argnum);
-            eval_disp(node, &state);
-        }
-        else if(streq(func_name,"add2")){
-            type_check_add2(node, &state, car_eval_argnum);
-            eval_add2(node, &state);
-        }
-        else if(streq(func_name,"sub2")){
-            type_check_sub2(node, &state, car_eval_argnum);
-            eval_sub2(node, &state);
-        }
-        else if(streq(func_name,"mul2")){
-            type_check_mul2(node, &state, car_eval_argnum);
-            eval_mul2(node, &state);
-        }
-        else if(streq(func_name,"div2")){
-            type_check_div2(node, &state, car_eval_argnum);
-            eval_div2(node, &state);
-        }
-        else if(streq(func_name,"newline")){
-            //type_check_newline(node, &state, car_eval_argnum);
-            eval_newline(node, &state);
-        }
-        else if(streq(func_name,"=")){
-            type_check_equal(node, &state, car_eval_argnum);
-            eval_equal(node, &state);
+        if( state != DEFINING ){ // if defining, then skip!
+            char* func_name = car(node)->name;
+            if(streq(func_name,"disp")){
+                type_check_disp(node, &state, car_eval_argnum);
+                eval_disp(node, &state);
+            }
+            else if(streq(func_name,"add2")){
+                type_check_add2(node, &state, car_eval_argnum);
+                eval_add2(node, &state);
+            }
+            else if(streq(func_name,"sub2")){
+                type_check_sub2(node, &state, car_eval_argnum);
+                eval_sub2(node, &state);
+            }
+            else if(streq(func_name,"mul2")){
+                type_check_mul2(node, &state, car_eval_argnum);
+                eval_mul2(node, &state);
+            }
+            else if(streq(func_name,"div2")){
+                type_check_div2(node, &state, car_eval_argnum);
+                eval_div2(node, &state);
+            }
+            else if(streq(func_name,"newline")){
+                //type_check_newline(node, &state, car_eval_argnum);
+                eval_newline(node, &state);
+            }
+            else if(streq(func_name,"=")){
+                type_check_equal(node, &state, car_eval_argnum);
+                eval_equal(node, &state);
+            }
+            else{ // call other function.
+                Value value;
+                Type type;
+                int argnum;
+                auto error_flag = get_from_symtab(node->name, 
+                                                  &type, &value, &argnum);
+                if(error_flag == UNBOUND_VARIABLE) {
+                    error_report(node, UNBOUND_VARIABLE, &state);
+                }else{
+                    // copy and paste.
+                }
+            }
         }
     }
 
