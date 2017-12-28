@@ -143,7 +143,8 @@ int     list_len(Node* list)
 {
     int len = 0;
     while(list != NULL){
-        len++;
+        if(car(list) != NULL)
+            len++;
         list = cdr(list); 
     }
     return len;

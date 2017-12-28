@@ -105,3 +105,18 @@ TEST_CASE("display"){
     //fp(floatnum);
     deinit_symtab();
 }
+
+TEST_CASE("newline"){
+    init_symtab();
+
+    Value val;
+    get_from_symtab("newline", NULL, &val);
+
+    auto arglist = get_arglist(val);
+
+    auto fp = (none_Val)get_body(val);
+    //printf("1");
+    //fp();
+    //printf("2");
+    deinit_symtab();
+}

@@ -83,7 +83,7 @@ public:
     }
 };
 
-// primitives: displayk
+// primitives: display
 TEST_CASE_METHOD(IOFixture, "display 1, display is function."){
     set_prog_src("(display 123)",true);
     auto root = syntax_tree;
@@ -151,25 +151,32 @@ TEST_CASE_METHOD(IOFixture, "interger is not applicable 2"){
     REQUIRE_THAT( actual(), Equals(string("141")
                                   +string(not_applicable_errmsg)) );
 }
-/*
-//primitives             
-TEST_CASE_METHOD(IOFixture, "=: int x int -> bool"){
-    set_prog_src("(display (= 1 1))");
-    REQUIRE_THAT( actual(), Equals("true") );
+
+TEST_CASE_METHOD(IOFixture, "newline: () -> notype: output func"){
+    set_prog_src("(newline)");
+    REQUIRE_THAT( actual(), Equals("\n") );
 }
+
 TEST_CASE_METHOD(IOFixture, "bool: #t"){
     set_prog_src("#t");
     REQUIRE_THAT( actual(), Equals("") );
 }
 TEST_CASE_METHOD(IOFixture, "display bool: #t"){
-    set_prog_src("(display #t)(newline)(display #f)");
-    REQUIRE_THAT( actual(), Equals("true\nfalse") );
+    set_prog_src("(display #t)(display #f)");
+    REQUIRE_THAT( actual(), Equals("truefalse") );
 }
 
+// add2
 TEST_CASE_METHOD(IOFixture, "add2 = arg1 + arg2"){
     set_prog_src("(display (add2 2 4))");
     REQUIRE_THAT( actual(), Equals("6") );
 }
+/*
+TEST_CASE_METHOD(IOFixture, "=: int x int -> bool"){
+    set_prog_src("(display (= 1 1))");
+    REQUIRE_THAT( actual(), Equals("true") );
+}
+
 TEST_CASE_METHOD(IOFixture, "sub2 = arg1 - arg2"){
     set_prog_src("(display (sub2 2 40))");
     REQUIRE_THAT( actual(), Equals("-38") );
@@ -181,10 +188,6 @@ TEST_CASE_METHOD(IOFixture, "recursive calculation 1"){
 TEST_CASE_METHOD(IOFixture, "recursive calculation 2"){
     set_prog_src("(display (add2 (add2 10 40) (add2 (sub2 4 8) 3)))");
     REQUIRE_THAT( actual(), Equals("49") );
-}
-TEST_CASE_METHOD(IOFixture, "newline: () -> notype: output func"){
-    set_prog_src("(newline)");
-    REQUIRE_THAT( actual(), Equals("\n") );
 }
 
 
@@ -282,21 +285,6 @@ TEST_CASE("pair-[display,p]"){
 }
 
 
-TEST_CASE_METHOD(IOFixture, "unbound variable error","[.]"){
-    // it should be parsed. it is SEMANTIC error.
-    set_prog_src("unbound-id");
-    REQUIRE_THAT( actual(), Equals(string("unbound-id")
-                                  +string(unbound_variable_errmsg)));
-}
-
-TEST_CASE_METHOD(IOFixture, "unbound variable error2"){
-    // it should be parsed. it is SEMANTIC error.
-    set_prog_src("(unbound-id2 unde3)");
-    REQUIRE_THAT( actual(), Equals(string("unbound-id2")
-                                  +string(unbound_variable_errmsg)
-                                  +string("unde3")
-                                  +string(unbound_variable_errmsg)));
-}
 TEST_CASE_METHOD(IOFixture, "define: must be used with 2 expressions."){
     set_prog_src("(define newid 12 43)");
     REQUIRE_THAT( actual(), Equals(string("define")

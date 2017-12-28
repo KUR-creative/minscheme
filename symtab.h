@@ -10,6 +10,7 @@ extern "C"
 typedef Value (*ValxVal_Val)(Value,Value);
 typedef Value (*Val_Val)(Value);
 typedef Value (*pNode_Val)(Node*);
+typedef Value (*none_Val)();
 
 void* get_body(Value bodyptr);
 Node* get_arglist(Value value);

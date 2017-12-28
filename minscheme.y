@@ -39,6 +39,7 @@ prog:
 
 expr:
         '(' pair ')'    { $$ = $2; }
+    |   '(' ')'         { $$ = atom("nil", PAIR, UNKNOWN_VAL); }
     |   INTtok          { long long val = strtoll(yytext, NULL, 10);
                           $$ = atom(yytext, INT, val); }
     |   FLOATtok        { long long val;

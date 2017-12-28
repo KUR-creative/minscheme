@@ -22,6 +22,13 @@ bool streq(char* s1, char* s2){
     //{ "if",     {IF_TYPE,       1ll, 3} }, // special form: 1ll
 unordered_map<string,Entry> symtab;  // global env.
 
+Value newline(void)
+{
+    //printf("\n");
+    fprintf(yyout, "\n");
+    return UNKNOWN_VAL;
+}
+
 // primitives.
 Value add2(Value a, Value b)
 {
@@ -70,6 +77,11 @@ Node* get_arglist(Value value)
 
 void init_symtab(void)
 {
+    Node* nl_args   = atom("nil", PAIR, 0ll);
+    Node* nl_node   = pair("pair", PAIR, 0ll,
+                           nl_args,
+                           atom("func-ptr", NO_TYPE, (Value)newline));
+
     Node* disp_args = pair("arg-list",PAIR, 0ll,
                            atom("arg1", GENERIC, 0ll),
                            NULL);
@@ -83,18 +95,20 @@ void init_symtab(void)
                                 atom("arg2", INT, 0ll),
                                 NULL));
     Node* add2node  = pair("pair", PAIR, 0ll,
-                           add2args, atom("func-ptr", NO_TYPE, (Value)add2));
+                           add2args,
+                           atom("func-ptr", NO_TYPE, (Value)add2));
+
 
     //pretty_print(add2node,0);
     //pretty_print(disp_node,0);
     symtab = 
     {
+        { "newline",{FUNC, (Value)nl_node} },
         { "display",{FUNC, (Value)disp_node} },  // primitive func has C function ptr.
         { "add2",   {FUNC, (Value)add2node} }, 
         { "sub2",   {FUNC, 0ll} },
         { "mul2",   {FUNC, 0ll} },
         { "div2",   {FUNC, 0ll} },
-        { "newline",{FUNC, 0ll  } },
         { "=",      {FUNC, 0ll} }, 
     };
 }

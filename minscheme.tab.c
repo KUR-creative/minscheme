@@ -396,18 +396,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  12
+#define YYFINAL  13
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   10
+#define YYLAST   19
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  12
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  11
+#define YYNRULES  12
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  15
+#define YYNSTATES  16
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -454,8 +454,8 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    37,    37,    41,    42,    44,    49,    50,    51,    53,
-      57,    60
+       0,    37,    37,    41,    42,    43,    45,    50,    51,    52,
+      54,    58,    61
 };
 #endif
 
@@ -494,8 +494,8 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -4,    -4,    -4,    -4,    -4,    -4,    -3,     2,    -3,
-      -4,    -2,    -4,    -4,    -4
+       6,    -4,    -4,    -4,    -4,    -4,    -4,    -3,     2,     6,
+      -4,    -4,     0,    -4,    -4,    -4
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -503,14 +503,14 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     4,     6,     7,     8,     9,     5,     0,     0,    10,
-       2,     0,     1,    11,     3
+       0,     5,     7,     8,     9,    10,     6,     0,     0,    11,
+       2,     4,     0,     1,    12,     3
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -4,    -4,    -4,     1
+      -4,    -4,    -4,    10
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
@@ -524,14 +524,14 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-       1,     2,    12,     3,     4,     5,     6,     7,    11,    14,
-      13
+       1,     2,    13,     3,     4,     5,     6,     7,    11,     1,
+       2,    15,     3,     4,     5,     6,     7,    12,     0,    14
 };
 
-static const yytype_uint8 yycheck[] =
+static const yytype_int8 yycheck[] =
 {
-       3,     4,     0,     6,     7,     8,     9,    10,     7,    11,
-       9
+       3,     4,     0,     6,     7,     8,     9,    10,    11,     3,
+       4,    11,     6,     7,     8,     9,    10,     7,    -1,     9
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -539,21 +539,21 @@ static const yytype_uint8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,     3,     4,     6,     7,     8,     9,    10,    13,    14,
-      15,    15,     0,    15,    11
+      15,    11,    15,     0,    15,    11
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
        0,    12,    13,    14,    14,    14,    14,    14,    14,    14,
-      15,    15
+      14,    15,    15
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     3,     1,     1,     1,     1,     1,     1,
-       1,     2
+       0,     2,     1,     3,     2,     1,     1,     1,     1,     1,
+       1,     1,     2
 };
 
 
@@ -1243,64 +1243,70 @@ yyreduce:
 
   case 4:
 #line 42 "minscheme.y" /* yacc.c:1646  */
-    { long long val = strtoll(yytext, NULL, 10);
-                          (yyval.node_t) = atom(yytext, INT, val); }
-#line 1249 "minscheme.tab.c" /* yacc.c:1646  */
+    { (yyval.node_t) = atom("nil", PAIR, UNKNOWN_VAL); }
+#line 1248 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 44 "minscheme.y" /* yacc.c:1646  */
+#line 43 "minscheme.y" /* yacc.c:1646  */
+    { long long val = strtoll(yytext, NULL, 10);
+                          (yyval.node_t) = atom(yytext, INT, val); }
+#line 1255 "minscheme.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 6:
+#line 45 "minscheme.y" /* yacc.c:1646  */
     { long long val;
                           double double_val = atof(yytext);
                           //val = *(long long*)(&double_val);// no cast!
                           val = double_to_Value(double_val);// no cast!
                           (yyval.node_t) = atom(yytext, INT, val); }
-#line 1259 "minscheme.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 6:
-#line 49 "minscheme.y" /* yacc.c:1646  */
-    { (yyval.node_t) = atom(yytext, GENERIC, UNKNOWN_VAL); }
 #line 1265 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
 #line 50 "minscheme.y" /* yacc.c:1646  */
-    { (yyval.node_t) = atom("define", SPECIAL, UNKNOWN_VAL); }
+    { (yyval.node_t) = atom(yytext, GENERIC, UNKNOWN_VAL); }
 #line 1271 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
 #line 51 "minscheme.y" /* yacc.c:1646  */
-    { long long val = ((yytext[1] == 't') ? 1 : 0);
-                          (yyval.node_t) = atom(yytext, BOOL, val); }
-#line 1278 "minscheme.tab.c" /* yacc.c:1646  */
+    { (yyval.node_t) = atom("define", SPECIAL, UNKNOWN_VAL); }
+#line 1277 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 53 "minscheme.y" /* yacc.c:1646  */
-    { (yyval.node_t) = atom("if", SPECIAL, UNKNOWN_VAL); }
+#line 52 "minscheme.y" /* yacc.c:1646  */
+    { long long val = ((yytext[1] == 't') ? 1 : 0);
+                          (yyval.node_t) = atom(yytext, BOOL, val); }
 #line 1284 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 57 "minscheme.y" /* yacc.c:1646  */
-    { (yyval.node_t) = pair("end-pair", PAIR, UNKNOWN_VAL, 
-                                    (yyvsp[0].node_t), NULL);// NO_NAME 
-                        }
-#line 1292 "minscheme.tab.c" /* yacc.c:1646  */
+#line 54 "minscheme.y" /* yacc.c:1646  */
+    { (yyval.node_t) = atom("if", SPECIAL, UNKNOWN_VAL); }
+#line 1290 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 60 "minscheme.y" /* yacc.c:1646  */
+#line 58 "minscheme.y" /* yacc.c:1646  */
+    { (yyval.node_t) = pair("end-pair", PAIR, UNKNOWN_VAL, 
+                                    (yyvsp[0].node_t), NULL);// NO_NAME 
+                        }
+#line 1298 "minscheme.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 12:
+#line 61 "minscheme.y" /* yacc.c:1646  */
     { (yyval.node_t) = pair("pair", PAIR, UNKNOWN_VAL,
                                     (yyvsp[-1].node_t), (yyvsp[0].node_t)); // NO_NAME
                         }
-#line 1300 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1306 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1304 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1310 "minscheme.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1528,6 +1534,6 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 65 "minscheme.y" /* yacc.c:1906  */
+#line 66 "minscheme.y" /* yacc.c:1906  */
 
 

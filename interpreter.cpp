@@ -24,6 +24,11 @@ using std::cout;
 using std::endl;
 
 inline static
+bool streq(char* s1, char* s2){
+    return (strcmp(s1, s2) == 0);
+}
+
+inline static
 void view_stack(Node* now_node, stack<tuple<Node,int,int>>& s){
     if(now_node != NULL){
         cout << now_node->name << ' ';
@@ -82,6 +87,12 @@ State interpret(Node* node, State state)
         }
 
         if(state == LL){ // evaluation! - push func node to stack.
+            if(node->type != FUNC){
+                string errmsg = string(node->name) 
+                                + string(not_applicable_errmsg);
+                fprintf(yyout, "%s", errmsg.c_str());
+                return ERRORstate;
+            }
             Node*   arglist = get_arglist(val); 
             int     argnum  = list_len(arglist);
             run_stack.push( make_tuple(*node,argnum,0) );
@@ -93,6 +104,43 @@ State interpret(Node* node, State state)
             run_stack.push( make_tuple(*node,max_argnum,accepted_argnum) );
         }
     }
+
+    if(car_state == LL){ // application! - pop func and calculate!
+        auto    top         = run_stack.top();
+        auto    max_argnum  = get<1>(top);
+        auto    accepted_num= get<2>(top); // no push. no +1
+        if(max_argnum == accepted_num){ 
+            char* car_name = car(node)->name;
+            if(streq(car_name,"display")){
+                // get arguments
+                Node arg        = get<0>(run_stack.top());
+                run_stack.pop();
+                Value disp_ptr  = get<0>(run_stack.top()).value;
+                run_stack.pop();
+
+                auto func       = (pNode_Val)get_body(disp_ptr);
+                func(&arg);
+            }
+            else if(streq(car_name, "newline")){
+                Value disp_ptr  = get<0>(run_stack.top()).value;
+                run_stack.pop();
+
+                auto func       = (none_Val)get_body(disp_ptr);
+                func();
+            }
+        }
+        else{
+            string errmsg = string(car(node)->name) 
+                            + string(incorrect_argnum_errmsg);
+            fprintf(yyout, "%s", errmsg.c_str());
+            return ERRORstate;
+        }
+    }
+    
+    // watch stack.
+    //view_stack(node, run_stack); cout << endl;
+    return state;
+}
 
             /*
             for(int i = 0; i < max_argnum + 1; i++){ // pop function too!
@@ -113,31 +161,6 @@ State interpret(Node* node, State state)
             func(&arg); // 이거 어째야 되는데? 커링인가 뭔가 해야되나..
             // arity를 같이 주는 방법이 있다..
             */
-    if(car_state == LL){ // application! - pop func and calculate!
-        auto    top         = run_stack.top();
-        auto    max_argnum  = get<1>(top);
-        auto    accepted_num= get<2>(top); // no push. no +1
-        if(max_argnum == accepted_num){ 
-            // get arguments
-            Node arg        = get<0>(run_stack.top());
-            run_stack.pop();
-            Value disp_ptr  = get<0>(run_stack.top()).value;
-            run_stack.pop();
-
-            auto func       = (pNode_Val)get_body(disp_ptr);
-            func(&arg);
-        }else{
-            string errmsg = string(car(node)->name) 
-                            + string(incorrect_argnum_errmsg);
-            fprintf(yyout, "%s", errmsg.c_str());
-            return ERRORstate;
-        }
-    }
-    
-    // watch stack.
-    //view_stack(node, run_stack); cout << endl;
-    return state;
-}
 
 //static char tmpstrbuf[32] = {0,};
 /*

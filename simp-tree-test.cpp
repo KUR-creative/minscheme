@@ -12,11 +12,12 @@ extern "C"
 
 TEST_CASE("del_tree must be set deleted root NULL")
 {
-    Node* node = atom("name", INT, 1ll, 1ll);
+    Node* node = atom("name", INT, 1ll);
     del_tree(&node);
     REQUIRE(node == NULL);
 }
 
+/*
 TEST_CASE("list len"){
     Node* li = NULL;
     REQUIRE(list_len(li) == 0);
@@ -24,6 +25,12 @@ TEST_CASE("list len"){
     li = new_node2(NULL,NULL,"root");
     REQUIRE(list_len(li) == 1);
     del_tree(&li);
+}
+*/
+
+TEST_CASE("list len = 0 means 'nil'"){
+    Node* nil = atom("nil", PAIR, UNKNOWN_VAL);
+    REQUIRE(list_len(nil) == 0);
 }
 
 TEST_CASE("list len = 2"){
