@@ -4,6 +4,7 @@
 using std::string;
 using std::cout;
 using std::endl;
+using Catch::Matchers::Equals;
 
 extern "C"
 {
@@ -66,9 +67,29 @@ public:
     }
 };
 
+TEST_CASE_METHOD(IOFixture, "define function"){
+    set_prog_src("(define (f arg) arg) (disp (f 3))",true);
+    pretty_print(syntax_tree,0);
+    REQUIRE_THAT( actual(), Equals("3") );
+}
+TEST_CASE_METHOD(IOFixture, "define if"){
+    set_prog_src("(define (f arg) (if arg 3 -4))",true);
+    //pretty_print(syntax_tree,0);
+    REQUIRE_THAT( actual(), Equals("") );
+}
+TEST_CASE_METHOD(IOFixture, "define if, call","[.]"){
+    set_prog_src("(define (f arg) (if arg 3 -4)) (disp (f #t))",true);
+    //pretty_print(syntax_tree,0);
+    REQUIRE_THAT( actual(), Equals("3") );
+}
+
+// 치환은 eval과 함께 이루어져야 한다.....
 /*
 TEST_CASE_METHOD(IOFixture, "get factorial definition tree"){
-    set_prog_src("(define (fac n) (if (= n 1) 1 (* n (fac (- n 1))))) (fac 4) (disp (fac 5))");
+    set_prog_src("(define (fac n) (if (= n 1) 1 (mul2 n (fac (sub2 n 1))))) (fac 4) (disp (fac 5))",true);
+    cout << "after interpret" << endl;
+    pretty_print(syntax_tree,0);
+    cout << "--------------" << endl;
     // just look and feel: pretty_print
 }
 TEST_CASE_METHOD(IOFixture, "look"){
@@ -107,7 +128,6 @@ TEST_CASE("pair-[disp,p]"){
 }
 */
 
-using Catch::Matchers::Equals;
 TEST_CASE_METHOD(IOFixture, "check hints 1","[.]"){ // it is maybe useless.
     set_prog_src("(disp 1)");
     auto root = syntax_tree;
@@ -138,7 +158,7 @@ TEST_CASE_METHOD(IOFixture, "multiline disp"){
     REQUIRE_THAT( actual(), Equals("451452") );
 }
 
-TEST_CASE_METHOD(IOFixture, "unbound variable error"){
+TEST_CASE_METHOD(IOFixture, "unbound variable error","[.]"){
     // it should be parsed. it is SEMANTIC error.
     set_prog_src("unbound-id");
     REQUIRE_THAT( actual(), Equals(string("unbound-id")
@@ -166,7 +186,7 @@ TEST_CASE_METHOD(IOFixture, "define: id is unbound variable, but no error."){
 }
 
 TEST_CASE_METHOD(IOFixture, "define: add new symbol to symtab"){
-    set_prog_src("(define id1 12)",true);
+    set_prog_src("(define id1 12)");
     Value retval = 0;
     Type type;
     int argnum;
@@ -202,8 +222,8 @@ TEST_CASE_METHOD(IOFixture, "caadr"){
 
 // why don't eval.. ?
 TEST_CASE_METHOD(IOFixture, "define: function"){
-    set_prog_src("(define (func a b) (add2 a b))", true);
-    pretty_print(syntax_tree,0);
+    set_prog_src("(define (func a b) (add2 a b))");
+    //pretty_print(syntax_tree,0);
     Value retval = 0;
     Type type;
     int argnum;
@@ -216,8 +236,13 @@ TEST_CASE_METHOD(IOFixture, "define: function"){
 }
 TEST_CASE_METHOD(IOFixture, "define: function, and call"){
     set_prog_src("(define (func a b) (add2 a b)) (disp (func 3 4))", true);
+    cout << "===== after interpret =====" << endl;
     pretty_print(syntax_tree,0);
-    auto err = get_from_symtab("func", NULL, NULL, NULL);
+    Value retval = 0;
+    Type type;
+    int argnum;
+    auto err = get_from_symtab("func", &type, &retval, &argnum);   
+    cout << '[' << type << '|' << retval << '|' << argnum << ']' << endl;
     REQUIRE( err != UNBOUND_VARIABLE );
     REQUIRE_THAT( actual(), Equals("7") );
 }
@@ -226,9 +251,11 @@ TEST_CASE_METHOD(IOFixture, "define: function, and call"){
 // 등등... 예외는 많다..
 //
 TEST_CASE_METHOD(IOFixture, "copy tree"){
-    set_prog_src("(disp (func 3 4))", true);
+    set_prog_src("(1 2 (3 4) (5 6))");
     auto* copyed = copy_tree(syntax_tree);
-    pretty_print(copyed,0);
+    //pretty_print(copyed,0);
+    //cout << "!!!! !!! !!! !!!! !!!!!" << endl;
+    // copyed! maybe...
 }
 
 //(if #f (disp 1)(disp 0))
@@ -368,7 +395,7 @@ TEST_CASE_METHOD(IOFixture, "error aborts the evaluation."){
 }
 */
 TEST_CASE_METHOD(IOFixture, "if func is arg, then don't eval the func.","[.]"){
-    set_prog_src("(add2 disp 4)", true);
+    set_prog_src("(add2 disp 4)");
     REQUIRE_THAT( actual(), Equals(string("(add2 disp 4)")
                                   +string(type_mismatch_errmsg)) );
 }
@@ -390,3 +417,14 @@ TEST_CASE_METHOD(IOFixture, "calculation"){
                   (disp (sub2 b c))");
     REQUIRE_THAT( actual(), Equals("36\n22") );
 }
+
+TEST_CASE_METHOD(IOFixture, "calculation2"){
+    set_prog_src("(define a 12)     \
+                  (define b 24)     \
+                  (define c  2)     \
+                  (disp (add2 a (add2 b c))) \
+                  (newline)         \
+                  (disp (sub2 b (sub2 c a)))");
+    REQUIRE_THAT( actual(), Equals("38\n34") );
+}
+

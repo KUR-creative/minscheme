@@ -99,7 +99,9 @@ void    pretty_print(Node* tree, int depth)
     for(int i = 0; i < depth; i++){
         printf("\t");
     }
-    printf("%s \n", tree->name);
+    //printf("%s|%d|%lld \n", tree->name, tree->type, tree->value);
+    printf("%s|%d| \n", tree->name, tree->type);
+    //printf("%s \n", tree->name);
     for(int i = 0; i < NUM_CHILD; i++){
         Node* child = tree->child[i];
         if(child != NULL){
@@ -168,13 +170,17 @@ PrevEdges push_cdr(PrevEdges edges)
 }
 
 Node*   copy_tree(Node* tree)
-{
-    Node* ret_tree = new_node2(NULL, NULL, tree->name);
-    ret_tree->hint = tree->hint;
-    ret_tree->type = tree->type;
-    ret_tree->value = tree->value;
-    ret_tree->argnum = tree->argnum;
-    car(ret_tree) = copy_tree(car(tree));
-    cdr(ret_tree) = copy_tree(cdr(tree));
+{   
+    Node* ret_tree = NULL;
+    if(tree != NULL){
+        ret_tree = new_node2(NULL, NULL, tree->name);
+        ret_tree->hint = tree->hint;
+        ret_tree->type = tree->type;
+        ret_tree->value = tree->value;
+        ret_tree->argnum = tree->argnum;
+        car(ret_tree) = copy_tree(car(tree));
+        cdr(ret_tree) = copy_tree(cdr(tree));
+    }
     return ret_tree;
 }
+

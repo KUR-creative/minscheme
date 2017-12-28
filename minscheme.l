@@ -29,5 +29,5 @@ void yyerror(char *s) {
 }
 
 int yywrap(void) {
-    return 1; // 왜 eof에서 1이 반환이 안 되지? 이건 그럼 뭔 의미..
+    return 1; 
 }

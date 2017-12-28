@@ -2,3 +2,7 @@
 (newline)
 (disp (sub2 10 2))
 (newline)
+(disp (mul2 10 2))
+(newline)
+(disp (div2 10 2))
+(newline)

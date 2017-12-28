@@ -290,6 +290,24 @@ void error_report(Node* node, ErrorKind kind, Inherit* state, int argnum)
     }
 }
 
+void    set_actual_param(Node* node, char* formal_name, Value actual_value)
+{   
+    if(node != NULL){
+                //pretty_print(node,0);
+                //cout << "------------------------" << endl;
+        if( streq(node->name, formal_name) &&
+            node->hint == ID_ATOM)
+        {
+            //cout << node->name << ',' << formal_name << ',' << node->value << endl;
+            node->value = actual_value;
+            node->type = INT;
+            //cout << node->name << ',' << formal_name << ',' << node->value << endl;
+        }
+        set_actual_param(car(node), formal_name, actual_value);
+        set_actual_param(cdr(node), formal_name, actual_value);
+    }
+}
+
 //inline static
 //bool 
 //TODO: remove NOT_APPLICABLE error.
@@ -313,10 +331,48 @@ Type interpret(Node* node, Inherit state, PrevEdges prevXX) {
     }
 
     int car_eval_argnum;
-    if( car_type == FUNC ){
+    if( car_type == FUNC && state != DEFINING){ // before eval 
         state = FUNC_CALL; 
         if( incorrect_argnum(node, &car_eval_argnum) ) { 
             error_report(node, INCORRECT_ARGNUM, &state);
+        }
+        Type type;
+        Value value;
+        int argnum;
+        auto error_flag = get_from_symtab(car(node)->name, 
+                                          &type, &value, &argnum);
+        if(error_flag == UNBOUND_VARIABLE) {
+            //error_report(node, UNBOUND_VARIABLE, &state);
+        }else{
+            if(value != 0ll){ // not primitive.
+                //cout << '{' << car(node)->name << '}' << endl;
+                auto* origin = new_node2(car(node), cdr(node),"pair");
+                //pretty_print(origin,0);
+                
+                auto* copyed = copy_tree((Node*)value);
+                car(node) = car(copyed);
+                cdr(node) = cdr(copyed);
+                //cout << "--node--" << endl;
+                //pretty_print(node,0);
+                //pretty_print(origin,0);
+                //pretty_print(syntax_tree,0);
+
+                Node* formal = node;
+                Node* actual = origin;
+                while(formal != NULL && actual != NULL ){
+                    if( car(formal) != NULL &&
+                        car(actual) != NULL)
+                    {
+                        set_actual_param(node, car(formal)->name, car(actual)->value);
+                    }
+                    formal = cdr(formal);
+                    actual = cdr(actual); 
+                }
+                interpret(node, state, prevXX);
+                //pretty_print(node,0);
+
+                del_tree(&origin);
+            }
         }
     }
     else if( car_type == DEFINE_TYPE ){ 
@@ -327,12 +383,14 @@ Type interpret(Node* node, Inherit state, PrevEdges prevXX) {
         eval_define(node, &state);
     }
     else if( car_type == IF_TYPE ){
-        state = SELECTION;
-        if( incorrect_argnum(node, &car_eval_argnum) ) { 
-            error_report(node, ILL_FORMED_SPECIAL_FORM, &state);
+        //state = SELECTION;
+        if(state != DEFINING){
+            if( incorrect_argnum(node, &car_eval_argnum) ) { 
+                error_report(node, ILL_FORMED_SPECIAL_FORM, &state);
+            }
+            //cout << '[' << car_eval_argnum << ']' << endl;
+            eval_if(node, &state);
         }
-        //cout << '[' << car_eval_argnum << ']' << endl;
-        eval_if(node, &state);
     }
 
     Type cdr_type = NULL_NODE;
@@ -357,7 +415,7 @@ Type interpret(Node* node, Inherit state, PrevEdges prevXX) {
 
     // type은 evaluation이 끝나고 나온다...
     // 이 시점에서 함수 호출의 길이는 이미 체크되어 있음.
-    if( car_type == FUNC ){ 
+    if( car_type == FUNC && car(node) != NULL){ 
         if( state != DEFINING ){ // if defining, then skip!
             char* func_name = car(node)->name;
             if(streq(func_name,"disp")){
@@ -388,31 +446,21 @@ Type interpret(Node* node, Inherit state, PrevEdges prevXX) {
                 type_check_equal(node, &state, car_eval_argnum);
                 eval_equal(node, &state);
             }
-            else{ // call other function.
-                Value value;
-                Type type;
-                int argnum;
-                auto error_flag = get_from_symtab(node->name, 
-                                                  &type, &value, &argnum);
-                if(error_flag == UNBOUND_VARIABLE) {
-                    error_report(node, UNBOUND_VARIABLE, &state);
-                }else{
-                    // copy and paste.
-                }
+            else{ // call other function. CAN't.
             }
         }
     }
 
 
     if( node->hint == ID_ATOM ){
-        if( state != DEFINING ){ // if defining, then skip!
+        if( state != DEFINING && state != FUNC_CALL){ // if defining, then skip!
             Value value;
             Type type;
             auto error_flag = get_from_symtab(node->name, 
                                               &type, &value, NULL);
 
             if(error_flag == UNBOUND_VARIABLE) {
-                error_report(node, UNBOUND_VARIABLE, &state);
+                //error_report(node, UNBOUND_VARIABLE, &state);
             }else{
                 node->type = type; 
                 node->value = value; 
