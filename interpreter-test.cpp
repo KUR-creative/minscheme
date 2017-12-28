@@ -83,21 +83,16 @@ public:
     }
 };
 
+// primitives: displayk
 TEST_CASE_METHOD(IOFixture, "display 1, display is function."){
     set_prog_src("(display 123)",true);
     auto root = syntax_tree;
     REQUIRE_THAT( actual(), Equals("123") );
 }
-/*
 TEST_CASE_METHOD(IOFixture, "display other"){
     set_prog_src("(display 264)");
     REQUIRE_THAT( actual(), Equals("264") );
 }
-TEST_CASE_METHOD(IOFixture, "display minus"){
-    set_prog_src("(display -523)");
-    REQUIRE_THAT( actual(), Equals("-523") );
-}
-
 TEST_CASE_METHOD(IOFixture, "multiple display"){
     set_prog_src("(display 1)(display 234)");
     REQUIRE_THAT( actual(), Equals("1234") );
@@ -106,6 +101,127 @@ TEST_CASE_METHOD(IOFixture, "multiline display"){
     set_prog_src("(display 451)\n(display 452)");
     REQUIRE_THAT( actual(), Equals("451452") );
 }
+
+//errors
+// arg num
+TEST_CASE_METHOD(IOFixture, "more: display must be called 1 arguments."){
+    set_prog_src("(display 1 2)");
+    REQUIRE_THAT( actual(), Equals(string("display")
+                                  +string(incorrect_argnum_errmsg)) );
+}
+TEST_CASE_METHOD(IOFixture, "less: display must be called 1 arguments."){
+    set_prog_src("(display)");
+    REQUIRE_THAT( actual(), Equals(string("display")
+                                  +string(incorrect_argnum_errmsg)) );
+}
+// unbound variable
+TEST_CASE_METHOD(IOFixture, "unbound variable error in terminal"){
+    // it should be parsed. it is SEMANTIC error.
+    set_prog_src("unbound-id");
+    REQUIRE_THAT( actual(), Equals(string("unbound-id")
+                                  +string(unbound_variable_errmsg)));
+}
+TEST_CASE_METHOD(IOFixture, "unbound variable error2"){
+    // it should be parsed. it is SEMANTIC error.
+    set_prog_src("(display unde3)");
+    REQUIRE_THAT( actual(), Equals(string("unde3")
+                                  +string(unbound_variable_errmsg)));
+}
+TEST_CASE_METHOD(IOFixture, "critical error aborts the execution"){
+    set_prog_src("unbound-id (display 3) (display -5)");
+    REQUIRE_THAT( actual(), Equals(string("unbound-id")
+                                  +string(unbound_variable_errmsg)) );
+}
+
+TEST_CASE_METHOD(IOFixture, "unbound variable error in LL terminal"){
+    // it should be parsed. it is SEMANTIC error.
+    set_prog_src("(unbound-id)");
+    REQUIRE_THAT( actual(), Equals(string("unbound-id")
+                                  +string(unbound_variable_errmsg)));
+}
+
+// not applicable
+TEST_CASE_METHOD(IOFixture, "interger is not applicable"){
+    set_prog_src("(141 2)");
+    REQUIRE_THAT( actual(), Equals(string("141")
+                                  +string(not_applicable_errmsg)) );
+}
+TEST_CASE_METHOD(IOFixture, "interger is not applicable 2"){
+    set_prog_src("(141 2 5 4)");
+    REQUIRE_THAT( actual(), Equals(string("141")
+                                  +string(not_applicable_errmsg)) );
+}
+/*
+//primitives             
+TEST_CASE_METHOD(IOFixture, "=: int x int -> bool"){
+    set_prog_src("(display (= 1 1))");
+    REQUIRE_THAT( actual(), Equals("true") );
+}
+TEST_CASE_METHOD(IOFixture, "bool: #t"){
+    set_prog_src("#t");
+    REQUIRE_THAT( actual(), Equals("") );
+}
+TEST_CASE_METHOD(IOFixture, "display bool: #t"){
+    set_prog_src("(display #t)(newline)(display #f)");
+    REQUIRE_THAT( actual(), Equals("true\nfalse") );
+}
+
+TEST_CASE_METHOD(IOFixture, "add2 = arg1 + arg2"){
+    set_prog_src("(display (add2 2 4))");
+    REQUIRE_THAT( actual(), Equals("6") );
+}
+TEST_CASE_METHOD(IOFixture, "sub2 = arg1 - arg2"){
+    set_prog_src("(display (sub2 2 40))");
+    REQUIRE_THAT( actual(), Equals("-38") );
+}
+TEST_CASE_METHOD(IOFixture, "recursive calculation 1"){
+    set_prog_src("(display (add2 1 (add2 2 3)))");
+    REQUIRE_THAT( actual(), Equals("6") );
+}
+TEST_CASE_METHOD(IOFixture, "recursive calculation 2"){
+    set_prog_src("(display (add2 (add2 10 40) (add2 (sub2 4 8) 3)))");
+    REQUIRE_THAT( actual(), Equals("49") );
+}
+TEST_CASE_METHOD(IOFixture, "newline: () -> notype: output func"){
+    set_prog_src("(newline)");
+    REQUIRE_THAT( actual(), Equals("\n") );
+}
+
+
+// arg num tests.
+TEST_CASE_METHOD(IOFixture, "add2 must be called 2 arguments."){
+    set_prog_src("(add2 1 2)");
+    REQUIRE_THAT( actual(), Equals("") );
+}
+TEST_CASE_METHOD(IOFixture, "add2 must be called 2 arguments. not 1"){
+    set_prog_src("(add2 2)");
+    REQUIRE_THAT( actual(), Equals(string("add2")
+                                  +string(incorrect_argnum_errmsg)) );
+}
+TEST_CASE_METHOD(IOFixture, "add2 must be called 2 arguments. not 0"){
+    set_prog_src("(add2)");
+    REQUIRE_THAT( actual(), Equals(string("add2")
+                                  +string(incorrect_argnum_errmsg)) );
+}
+TEST_CASE_METHOD(IOFixture, "sub2 must be called 2 arguments. not 1"){
+    set_prog_src("(sub2 2 2 4 3)");
+    REQUIRE_THAT( actual(), Equals(string("sub2")
+                                  +string(incorrect_argnum_errmsg)) );
+}
+TEST_CASE_METHOD(IOFixture, "sub2 must be called 2 arguments. not 0"){
+    set_prog_src("(sub2)");
+    REQUIRE_THAT( actual(), Equals(string("sub2")
+                                  +string(incorrect_argnum_errmsg)) );
+}
+TEST_CASE_METHOD(IOFixture, "mul2 = arg1 * arg2"){
+    set_prog_src("(display (mul2 2 4))");
+    REQUIRE_THAT( actual(), Equals("8") );
+}
+TEST_CASE_METHOD(IOFixture, "div2 = arg1 / arg2"){
+    set_prog_src("(display (div2 8 4))");
+    REQUIRE_THAT( actual(), Equals("2") );
+}
+
 TEST_CASE_METHOD(IOFixture, "define function"){
     set_prog_src("(define (f arg) arg) (display (f 3))",true);
     //pretty_print(syntax_tree,0);
@@ -292,86 +408,6 @@ TEST_CASE_METHOD(IOFixture, "if: recursive evaluation2."){
     REQUIRE_THAT( actual(), Equals("7") );
 }
 
-//primitives             
-TEST_CASE_METHOD(IOFixture, "=: int x int -> bool"){
-    set_prog_src("(display (= 1 1))");
-    REQUIRE_THAT( actual(), Equals("true") );
-}
-TEST_CASE_METHOD(IOFixture, "bool: #t"){
-    set_prog_src("#t");
-    REQUIRE_THAT( actual(), Equals("") );
-}
-TEST_CASE_METHOD(IOFixture, "display bool: #t"){
-    set_prog_src("(display #t)(newline)(display #f)");
-    REQUIRE_THAT( actual(), Equals("true\nfalse") );
-}
-
-TEST_CASE_METHOD(IOFixture, "add2 = arg1 + arg2"){
-    set_prog_src("(display (add2 2 4))");
-    REQUIRE_THAT( actual(), Equals("6") );
-}
-TEST_CASE_METHOD(IOFixture, "sub2 = arg1 - arg2"){
-    set_prog_src("(display (sub2 2 40))");
-    REQUIRE_THAT( actual(), Equals("-38") );
-}
-TEST_CASE_METHOD(IOFixture, "recursive calculation 1"){
-    set_prog_src("(display (add2 1 (add2 2 3)))");
-    REQUIRE_THAT( actual(), Equals("6") );
-}
-TEST_CASE_METHOD(IOFixture, "recursive calculation 2"){
-    set_prog_src("(display (add2 (add2 10 40) (add2 (sub2 4 8) 3)))");
-    REQUIRE_THAT( actual(), Equals("49") );
-}
-TEST_CASE_METHOD(IOFixture, "newline: () -> notype: output func"){
-    set_prog_src("(newline)");
-    REQUIRE_THAT( actual(), Equals("\n") );
-}
-
-// not applicable
-TEST_CASE_METHOD(IOFixture, "interger is not applicable","[.]"){
-    set_prog_src("(141 2)");
-    REQUIRE_THAT( actual(), Equals(string("141")
-                                  +string(not_applicable_errmsg)) );
-}
-TEST_CASE_METHOD(IOFixture, "interger is not applicable 2","[.]"){
-    set_prog_src("(141 2 5 4)");
-    REQUIRE_THAT( actual(), Equals(string("141")
-                                  +string(not_applicable_errmsg)) );
-}
-
-// arg num tests.
-TEST_CASE_METHOD(IOFixture, "add2 must be called 2 arguments."){
-    set_prog_src("(add2 1 2)");
-    REQUIRE_THAT( actual(), Equals("") );
-}
-TEST_CASE_METHOD(IOFixture, "add2 must be called 2 arguments. not 1"){
-    set_prog_src("(add2 2)");
-    REQUIRE_THAT( actual(), Equals(string("add2")
-                                  +string(incorrect_argnum_errmsg)) );
-}
-TEST_CASE_METHOD(IOFixture, "add2 must be called 2 arguments. not 0"){
-    set_prog_src("(add2)");
-    REQUIRE_THAT( actual(), Equals(string("add2")
-                                  +string(incorrect_argnum_errmsg)) );
-}
-TEST_CASE_METHOD(IOFixture, "sub2 must be called 2 arguments. not 1"){
-    set_prog_src("(sub2 2 2 4 3)");
-    REQUIRE_THAT( actual(), Equals(string("sub2")
-                                  +string(incorrect_argnum_errmsg)) );
-}
-TEST_CASE_METHOD(IOFixture, "sub2 must be called 2 arguments. not 0"){
-    set_prog_src("(sub2)");
-    REQUIRE_THAT( actual(), Equals(string("sub2")
-                                  +string(incorrect_argnum_errmsg)) );
-}
-TEST_CASE_METHOD(IOFixture, "mul2 = arg1 * arg2"){
-    set_prog_src("(display (mul2 2 4))");
-    REQUIRE_THAT( actual(), Equals("8") );
-}
-TEST_CASE_METHOD(IOFixture, "div2 = arg1 / arg2"){
-    set_prog_src("(display (div2 8 4))");
-    REQUIRE_THAT( actual(), Equals("2") );
-}
 
 TEST_CASE_METHOD(IOFixture, "display must be called 1 arguments."){
     set_prog_src("(display 1 2)");

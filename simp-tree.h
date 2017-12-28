@@ -29,6 +29,7 @@ typedef enum State { // L: car, R: cdr.
     DEFstate,
     IFstate,
     NOstate, // for initialization.
+    ERRORstate,
 } State;
 
 typedef enum Type{
@@ -38,7 +39,7 @@ typedef enum Type{
     BOOL,
     PAIR,
     NUMBER,
-    GENERIC,
+    GENERIC, // only IDENTIFIER
     SPECIAL,// APPLICABLE 2!
     NO_TYPE,
 } Type;

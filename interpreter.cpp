@@ -18,43 +18,124 @@ extern FILE *yyout;
 using std::stack;
 using std::tuple;
 using std::make_tuple;
+using std::get;
 using std::string;
 using std::cout;
 using std::endl;
 
-//Node temp_node = {0,};
+inline static
+void view_stack(Node* now_node, stack<tuple<Node,int,int>>& s){
+    if(now_node != NULL){
+        cout << now_node->name << ' ';
+    }
+    if(! s.empty()){
+        cout << '[' << get<0>(s.top()).name 
+             << '|' << get<1>(s.top()) 
+             << '|' << get<2>(s.top()) << ']';
+    }
+}
+
+inline static
+bool is_terminal(Node* node){
+    return (node->type != PAIR);
+}
+
 stack<tuple<Node,int,int>> run_stack;
+stack<tuple<Node,int,int>> tmp_stack;
 
 State interpret(Node* node, State state)
 {
-    //State car_state = NOstate;
+    State car_state = NOstate;
     if( car(node) != NULL ){
-        interpret(car(node), push_car(state));
+        car_state = interpret(car(node), push_car(state));
     }
+    if( car_state == ERRORstate ){
+        return ERRORstate;
+    }
+
+    State cdr_state = NOstate;
     if( cdr(node) != NULL ){
-        interpret(cdr(node), push_car(state));
+        cdr_state = interpret(cdr(node), push_cdr(state));
+    }
+    if( cdr_state == ERRORstate ){
+        return ERRORstate;
     }
 
-    if(state == LL){
+
+    //cout << '[' << node->name << '|' << state << "] \n"; 
+
+    if(is_terminal(node)){ 
         char* name = node->name;
-        Type type = node->type;
-        Value val = node->value;
+        Type type;
+        Value val;
+        if(node->type == GENERIC){
+            int err = get_from_symtab(name, &type, &val);
+            if(err == UNBOUND_VARIABLE){
+                string errmsg = string(node->name) 
+                                + string(unbound_variable_errmsg);
+                fprintf(yyout, "%s", errmsg.c_str());
+                return ERRORstate;
+            }
+            // set actual type/value.
+            node->type = type; 
+            node->value = val;
+        }
 
-        get_from_symtab(name, &type, &val);
-        auto arglist = get_arglist(val);
-        int argnum = list_len(arglist);
-
-        run_stack.push( make_tuple(*node,argnum,0) );
+        if(state == LL){ // evaluation! - push func node to stack.
+            Node*   arglist = get_arglist(val); 
+            int     argnum  = list_len(arglist);
+            run_stack.push( make_tuple(*node,argnum,0) );
+        }
+        else{ 
+            auto    top             = run_stack.top();
+            auto    max_argnum      = get<1>(top);
+            auto    accepted_argnum = get<2>(top) + 1;
+            run_stack.push( make_tuple(*node,max_argnum,accepted_argnum) );
+        }
     }
-    Value val;
-    get_from_symtab("add2", NULL, &val);
 
-    auto arglist = get_arglist(val);
-    //REQUIRE(car(arglist)->type == INT);
-    //REQUIRE(cadr(arglist)->type == INT);
+            /*
+            for(int i = 0; i < max_argnum + 1; i++){ // pop function too!
+                tmp_stack.push(run_stack.top());
+                run_stack.pop();
 
-    auto func = (Val_Val)get_body(val);
-    //func(
+                view_stack(NULL, run_stack);
+                view_stack(NULL, tmp_stack);
+                cout << endl;
+            }
+
+            Value disp_ptr  = get<0>(tmp_stack.top()).value;
+            tmp_stack.pop();
+            Node arg        = get<0>(tmp_stack.top());
+            tmp_stack.pop();
+
+            auto func       = (pNode_Val)get_body(disp_ptr);
+            func(&arg); // 이거 어째야 되는데? 커링인가 뭔가 해야되나..
+            // arity를 같이 주는 방법이 있다..
+            */
+    if(car_state == LL){ // application! - pop func and calculate!
+        auto    top         = run_stack.top();
+        auto    max_argnum  = get<1>(top);
+        auto    accepted_num= get<2>(top); // no push. no +1
+        if(max_argnum == accepted_num){ 
+            // get arguments
+            Node arg        = get<0>(run_stack.top());
+            run_stack.pop();
+            Value disp_ptr  = get<0>(run_stack.top()).value;
+            run_stack.pop();
+
+            auto func       = (pNode_Val)get_body(disp_ptr);
+            func(&arg);
+        }else{
+            string errmsg = string(car(node)->name) 
+                            + string(incorrect_argnum_errmsg);
+            fprintf(yyout, "%s", errmsg.c_str());
+            return ERRORstate;
+        }
+    }
+    
+    // watch stack.
+    //view_stack(node, run_stack); cout << endl;
     return state;
 }
 
