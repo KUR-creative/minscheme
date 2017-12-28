@@ -24,7 +24,6 @@ static char* ll2str(long long n){
     sprintf(tmpstrbuf, "%lld", n);
     return tmpstrbuf;
 }
-*/
 static 
 void error_report(Node* node, ErrorKind kind, Inherit* state, int argnum = 0);
 static
@@ -308,8 +307,6 @@ void    set_actual_param(Node* node, char* formal_name, Value actual_value)
     }
 }
 
-//inline static
-//bool 
 //TODO: remove NOT_APPLICABLE error.
 //      LL LR RL.. 왜 에러 나는가?
 //      분석해서, int가 eval되지 않게 하라.
@@ -472,3 +469,4 @@ Type interpret(Node* node, Inherit state, PrevEdges prevXX) {
 
     return node->type;
 }
+*/

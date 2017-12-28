@@ -5,7 +5,7 @@
 #include "simp-tree.h"
 #include "syscalls.h"
 
-const Value UNKNOWN_VAL = -1; 
+const Value UNKNOWN_VAL = -1000000000; 
 const void* NO_NAME = NULL;
 
 Node*   new_node1(Node* node1, char* str1)
@@ -67,7 +67,7 @@ Node*   new_node4(Node* node1, Node* node2, Node* node3, Node* node4,
 
 // INT has no name = NULL
 // GENERIC has name != NULL
-Node*   atom(char* name, Type type, Value value, Hint hint)
+Node*   atom(char* name, Type type, Value value, Value auxval)
 {
     Node*   ret = Calloc(1,sizeof(Node));
     if(name != NO_NAME) {
@@ -75,11 +75,11 @@ Node*   atom(char* name, Type type, Value value, Hint hint)
     }
     ret->type = type;
     ret->value = value;
-    ret->hint = hint;
+    ret->auxval = auxval;
     return ret;
 }
 
-Node*   pair(char* name, Type type, Value value, Hint hint, 
+Node*   pair(char* name, Type type, Value value, Value auxval, 
              Node* car, Node* cdr)
 {
     Node*   ret = Calloc(1,sizeof(Node));
@@ -90,7 +90,7 @@ Node*   pair(char* name, Type type, Value value, Hint hint,
     }
     ret->type = type;
     ret->value = value;
-    ret->hint = hint;
+    ret->auxval = auxval;
     return ret;
 }
 
@@ -100,6 +100,7 @@ void    pretty_print(Node* tree, int depth)
         printf("\t");
     }
     //printf("%s|%d|%lld \n", tree->name, tree->type, tree->value);
+    //printf("%c%c|%d| \n", tree->name[0], tree->name[1], tree->type);
     printf("%s|%d| \n", tree->name, tree->type);
     //printf("%s \n", tree->name);
     for(int i = 0; i < NUM_CHILD; i++){
@@ -149,7 +150,7 @@ int     list_len(Node* list)
     return len;
 }
 
-PrevEdges push_car(PrevEdges edges)
+State   push_car(State edges)
 {
     switch(edges){
     case RR: return RL;
@@ -159,7 +160,7 @@ PrevEdges push_car(PrevEdges edges)
     }
 }
 
-PrevEdges push_cdr(PrevEdges edges)
+State   push_cdr(State edges)
 {
     switch(edges){
     case RR: return RR;
@@ -174,10 +175,10 @@ Node*   copy_tree(Node* tree)
     Node* ret_tree = NULL;
     if(tree != NULL){
         ret_tree = new_node2(NULL, NULL, tree->name);
-        ret_tree->hint = tree->hint;
+        ret_tree->auxval = tree->auxval;
         ret_tree->type = tree->type;
         ret_tree->value = tree->value;
-        ret_tree->argnum = tree->argnum;
+        //ret_tree->argnum = tree->argnum;
         car(ret_tree) = copy_tree(car(tree));
         cdr(ret_tree) = copy_tree(cdr(tree));
     }

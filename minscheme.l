@@ -7,12 +7,14 @@
 %%
     
 "disp"                  { return DISP; }
-"define"                { return DEFINE; }
-("#t"|"#f")             { return BOOL; }
-"if"                    { return IF; }
+"define"                { return DEFtok; }
+("#t"|"#f")             { return BOOLtok; }
+"if"                    { return IFtok; }
     
-[-+]?[0-9]+             { return INTEGER; }
-[_a-zA-Z0-9?!+-/*=]+    { return IDENTIFIER; }
+\.                      yyerror("invalid character"); // float error case.
+[-+]?[0-9]*\.[0-9]*     { return FLOATtok; }
+[-+]?[0-9]+             { return INTtok; }
+[_a-zA-Z0-9?!+-/*=]+    { return IDtok; }
 
 [()]                    { return *yytext; }
                          

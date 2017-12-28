@@ -12,7 +12,7 @@ extern "C"
 
 TEST_CASE("del_tree must be set deleted root NULL")
 {
-    Node* node = atom("name", INT, 1ll, NO_CHILD);
+    Node* node = atom("name", INT, 1ll, 1ll);
     del_tree(&node);
     REQUIRE(node == NULL);
 }
@@ -69,8 +69,8 @@ TEST_CASE("LL LR RL RR"){
         REQUIRE(push_car(LR) == RL);
         REQUIRE(push_cdr(LR) == RR);
     }
-    cout << RR << endl;
-    cout << RL << endl;
-    cout << LL << endl;
-    cout << LR << endl;
+    //cout << RR << endl;
+    //cout << RL << endl;
+    //cout << LL << endl;
+    //cout << LR << endl;
 }

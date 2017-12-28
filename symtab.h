@@ -11,12 +11,12 @@ extern "C"
 typedef struct Entry {
     Type    type;
     Value   value;
-    int     argnum;
+    Value   auxval;
 } Entry;
 
 // return value is error code.
-int get_from_symtab(char* key, Type* rettype, Value* retval, int* ret_argnum); 
-int add_to_symtab(char* key, Type type, Value value, int argnum); 
+int get_from_symtab(char* key, Type* rettype, Value* retval, int* retauxval); 
+int add_to_symtab(char* key, Type type, Value value, int auxval); 
 //int get_func_from_symtab(char* key, Type* rettype, Value* retval); 
 //int add_func_to_symtab(char* key, Value bodyptr, int argnum);
 

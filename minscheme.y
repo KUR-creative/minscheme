@@ -1,4 +1,4 @@
-%token INTEGER IDENTIFIER DISP DEFINE BOOL IF
+%token INTtok IDtok DISP DEFtok BOOLtok IFtok FLOATtok
 
 %{
     #include <stdio.h>
@@ -28,7 +28,7 @@
     int             int_t;
 }
 
-%type<int_t>    INTEGER IDENTIFIER DISP DEFINE BOOL IF
+%type<int_t>    INTtok IDtok DISP DEFtok BOOLtok IFtok FLOATtok
 %type<node_t>   expr pair
 
 %%
@@ -39,21 +39,20 @@ prog:
 
 expr:
         '(' pair ')'    { $$ = $2; }
-    |   INTEGER         { long long val = strtoll(yytext, NULL, 10);
-                          $$ = atom(yytext, INT, val, INT_ATOM); }
-    |   IDENTIFIER      { $$ = atom(yytext, GENERIC, UNKNOWN_VAL, ID_ATOM); }
-    |   DISP            { $$ = atom("disp", FUNC, UNKNOWN_VAL, ID_ATOM); }
-    |   DEFINE          { $$ = atom("define", DEFINE_TYPE, UNKNOWN_VAL, DEFINE_ATOM); }
-    |   BOOL            { long long val = ((yytext[1] == 't') ? 1 : 0);
-                          $$ = atom(yytext, BOOL_TYPE, val, BOOL_ATOM); }
-    |   IF              { $$ = atom("if", IF_TYPE, UNKNOWN_VAL, IF_ATOM); }
+    |   INTtok          { long long val = strtoll(yytext, NULL, 10);
+                          $$ = atom(yytext, INT, val, 0); }
+    |   IDtok           { $$ = atom(yytext, GENERIC, UNKNOWN_VAL, 0); }
+    |   DEFtok          { $$ = atom("define", SPECIAL, UNKNOWN_VAL, 0); }
+    |   BOOLtok         { long long val = ((yytext[1] == 't') ? 1 : 0);
+                          $$ = atom(yytext, BOOL, val, 0); }
+    |   IFtok           { $$ = atom("if", SPECIAL, UNKNOWN_VAL, 0); }
     ;
 
 pair:
-        expr            { $$ = pair("end-pair", GENERIC, UNKNOWN_VAL, END_PAIR, 
+        expr            { $$ = pair("end-pair", GENERIC, UNKNOWN_VAL, NULL, 
                                     $1, NULL);// NO_NAME 
                         }
-    |   expr pair       { $$ = pair("pair", GENERIC, UNKNOWN_VAL, EXPR_PAIR,
+    |   expr pair       { $$ = pair("pair", GENERIC, UNKNOWN_VAL, NULL,
                                     $1, $2); // NO_NAME
                         }
     ;

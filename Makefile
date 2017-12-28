@@ -25,7 +25,7 @@ stt: # simp-tree test
 	g++ -std=c++11 -o simp-tree-test simp-tree-test.o $(OBJS)
 	./simp-tree-test
 
-t: # interpreter test
+it: # interpreter test
 	make compile
 	make interpreter-test.o
 	g++ -std=c++11 -o interpreter-test interpreter-test.o $(OBJS)
@@ -33,8 +33,15 @@ t: # interpreter test
 
 lt: # lexer test
 	make compile
-	g++ -std=c++11 -o lexer-test lexer-test.cpp $(OBJS)
+	make lexer-test.o
+	g++ -std=c++11 -o lexer-test lexer-test.o $(OBJS)
 	./lexer-test
+
+t: # parser test
+	make compile
+	make parser-test.o
+	g++ -std=c++11 -o parser-test parser-test.o $(OBJS)
+	./parser-test
 
 ta: # test all
 	make st
@@ -46,6 +53,10 @@ interpreter-test.o: interpreter-test.cpp
 	g++ -std=c++11 $(CFLAGS) -c interpreter-test.cpp
 simp-tree-test.o: simp-tree-test.cpp
 	g++ -std=c++11 $(CFLAGS) -c simp-tree-test.cpp
+lexer-test.o: lexer-test.cpp
+	g++ -std=c++11 $(CFLAGS) -c lexer-test.cpp
+parser-test.o: parser-test.cpp
+	g++ -std=c++11 $(CFLAGS) -c parser-test.cpp
 ######################################################################## 
 test-utils.o: test-utils.c test-utils.h 
 	$(CC) $(CFLAGS) -c test-utils.c
@@ -66,6 +77,7 @@ interpreter.o: interpreter.cpp interpreter.h
 	g++ $(CFLAGS) -c -std=c++11 interpreter.cpp
 
 $(NAME).yy.o: $(NAME).l
+	bison -dtv $(NAME).y
 	flex -o $(NAME).yy.c $(NAME).l
 	$(CC) $(CFLAGS) -c $(NAME).yy.c
 

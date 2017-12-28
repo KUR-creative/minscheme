@@ -8,17 +8,8 @@ extern "C"
 
 #include "simp-tree.h"
 
-typedef enum Inherit {
-    TOP_LIST,
-    NORMAL_NODE,
-    FUNC_CALL,
-    ERROR_STATE,
-    DEFINING,
-    SELECTION,
-} Inherit;
-
-Type interpret(Node* parse_tree, Inherit state, PrevEdges prevs);
-extern Node* syntax_tree;// defined in minscheme.y
+extern Node* syntax_tree;
+Type interpret(Node* parse_tree, State state);
 
 #ifdef __cplusplus
 }

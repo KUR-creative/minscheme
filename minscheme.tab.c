@@ -119,12 +119,13 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    INTEGER = 258,
-    IDENTIFIER = 259,
+    INTtok = 258,
+    IDtok = 259,
     DISP = 260,
-    DEFINE = 261,
-    BOOL = 262,
-    IF = 263
+    DEFtok = 261,
+    BOOLtok = 262,
+    IFtok = 263,
+    FLOATtok = 264
   };
 #endif
 
@@ -138,7 +139,7 @@ union YYSTYPE
     struct Node*    node_t;
     int             int_t;
 
-#line 142 "minscheme.tab.c" /* yacc.c:355  */
+#line 143 "minscheme.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -155,7 +156,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 159 "minscheme.tab.c" /* yacc.c:358  */
+#line 160 "minscheme.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -400,7 +401,7 @@ union yyalloc
 #define YYLAST   11
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  11
+#define YYNTOKENS  12
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
@@ -411,7 +412,7 @@ union yyalloc
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   263
+#define YYMAXUTOK   264
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -424,7 +425,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       9,    10,     2,     2,     2,     2,     2,     2,     2,     2,
+      10,    11,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -446,7 +447,7 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8
+       5,     6,     7,     8,     9
 };
 
 #if YYDEBUG
@@ -463,8 +464,9 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "INTEGER", "IDENTIFIER", "DISP",
-  "DEFINE", "BOOL", "IF", "'('", "')'", "$accept", "prog", "expr", "pair", YY_NULLPTR
+  "$end", "error", "$undefined", "INTtok", "IDtok", "DISP", "DEFtok",
+  "BOOLtok", "IFtok", "FLOATtok", "'('", "')'", "$accept", "prog", "expr",
+  "pair", YY_NULLPTR
 };
 #endif
 
@@ -473,8 +475,8 @@ static const char *const yytname[] =
    (internal) symbol number NUM (which must be that of a token).  */
 static const yytype_uint16 yytoknum[] =
 {
-       0,   256,   257,   258,   259,   260,   261,   262,   263,    40,
-      41
+       0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
+      40,    41
 };
 # endif
 
@@ -492,8 +494,8 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -3,    -4,    -4,    -4,    -4,    -4,    -4,    -3,     8,    -3,
-      -4,     1,    -4,    -4,    -4
+      -3,    -4,    -4,    -4,    -4,    -4,    -4,    -3,     9,    -3,
+      -4,     0,    -4,    -4,    -4
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -508,7 +510,7 @@ static const yytype_uint8 yydefact[] =
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -4,    -4,    -4,     0
+      -4,    -4,    -4,    -1
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
@@ -522,29 +524,29 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-       1,     2,     3,     4,     5,     6,     7,    11,    12,    13,
+       1,     2,     3,     4,     5,     6,    11,     7,    13,    12,
        0,    14
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     4,     5,     6,     7,     8,     9,     7,     0,     9,
-      -1,    10
+       3,     4,     5,     6,     7,     8,     7,    10,     9,     0,
+      -1,    11
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,     4,     5,     6,     7,     8,     9,    12,    13,
-      14,    14,     0,    14,    10
+       0,     3,     4,     5,     6,     7,     8,    10,    13,    14,
+      15,    15,     0,    15,    11
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    11,    12,    13,    13,    13,    13,    13,    13,    13,
-      14,    14
+       0,    12,    13,    14,    14,    14,    14,    14,    14,    14,
+      15,    15
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -1230,71 +1232,71 @@ yyreduce:
         case 2:
 #line 37 "minscheme.y" /* yacc.c:1646  */
     { syntax_tree = (yyvsp[0].node_t); }
-#line 1234 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1236 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
 #line 41 "minscheme.y" /* yacc.c:1646  */
     { (yyval.node_t) = (yyvsp[-1].node_t); }
-#line 1240 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1242 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
 #line 42 "minscheme.y" /* yacc.c:1646  */
     { long long val = strtoll(yytext, NULL, 10);
-                          (yyval.node_t) = atom(yytext, INT, val, INT_ATOM); }
-#line 1247 "minscheme.tab.c" /* yacc.c:1646  */
+                          (yyval.node_t) = atom(yytext, INT, val, 0); }
+#line 1249 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
 #line 44 "minscheme.y" /* yacc.c:1646  */
-    { (yyval.node_t) = atom(yytext, GENERIC, UNKNOWN_VAL, ID_ATOM); }
-#line 1253 "minscheme.tab.c" /* yacc.c:1646  */
+    { (yyval.node_t) = atom(yytext, GENERIC, UNKNOWN_VAL, 0); }
+#line 1255 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
 #line 45 "minscheme.y" /* yacc.c:1646  */
-    { (yyval.node_t) = atom("disp", FUNC, UNKNOWN_VAL, ID_ATOM); }
-#line 1259 "minscheme.tab.c" /* yacc.c:1646  */
+    { (yyval.node_t) = atom("disp", FUNC, UNKNOWN_VAL, 0); }
+#line 1261 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
 #line 46 "minscheme.y" /* yacc.c:1646  */
-    { (yyval.node_t) = atom("define", DEFINE_TYPE, UNKNOWN_VAL, DEFINE_ATOM); }
-#line 1265 "minscheme.tab.c" /* yacc.c:1646  */
+    { (yyval.node_t) = atom("define", SPECIAL, UNKNOWN_VAL, 0); }
+#line 1267 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
 #line 47 "minscheme.y" /* yacc.c:1646  */
     { long long val = ((yytext[1] == 't') ? 1 : 0);
-                          (yyval.node_t) = atom(yytext, BOOL_TYPE, val, BOOL_ATOM); }
-#line 1272 "minscheme.tab.c" /* yacc.c:1646  */
+                          (yyval.node_t) = atom(yytext, BOOL, val, 0); }
+#line 1274 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
 #line 49 "minscheme.y" /* yacc.c:1646  */
-    { (yyval.node_t) = atom("if", IF_TYPE, UNKNOWN_VAL, IF_ATOM); }
-#line 1278 "minscheme.tab.c" /* yacc.c:1646  */
+    { (yyval.node_t) = atom("if", SPECIAL, UNKNOWN_VAL, 0); }
+#line 1280 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
 #line 53 "minscheme.y" /* yacc.c:1646  */
-    { (yyval.node_t) = pair("end-pair", GENERIC, UNKNOWN_VAL, END_PAIR, 
+    { (yyval.node_t) = pair("end-pair", GENERIC, UNKNOWN_VAL, NULL, 
                                     (yyvsp[0].node_t), NULL);// NO_NAME 
                         }
-#line 1286 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1288 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
 #line 56 "minscheme.y" /* yacc.c:1646  */
-    { (yyval.node_t) = pair("pair", GENERIC, UNKNOWN_VAL, EXPR_PAIR,
+    { (yyval.node_t) = pair("pair", GENERIC, UNKNOWN_VAL, NULL,
                                     (yyvsp[-1].node_t), (yyvsp[0].node_t)); // NO_NAME
                         }
-#line 1294 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1296 "minscheme.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1298 "minscheme.tab.c" /* yacc.c:1646  */
+#line 1300 "minscheme.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires

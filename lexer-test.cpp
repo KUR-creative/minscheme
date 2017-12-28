@@ -41,8 +41,8 @@ TEST_CASE("yyXXX"){
     FILE*   mockfile= new_mockfile(tmpstr);
 
     yyin = mockfile;
-    REQUIRE(yylex() == IDENTIFIER);
-    REQUIRE(yylex() == INTEGER);
+    REQUIRE(yylex() == IDtok);
+    REQUIRE(yylex() == INTtok);
 
     del_mockfile(mockfile);
 }
@@ -63,7 +63,7 @@ SCENARIO("identifier"){
         FILE*   mockfile= new_mockfile(tmpstr);
 
         yyin = mockfile;
-        REQUIRE(yylex() == IDENTIFIER);
+        REQUIRE(yylex() == IDtok);
 
         finish_yyin_to_eof();
         del_mockfile(mockfile);
@@ -74,7 +74,7 @@ SCENARIO("identifier"){
         FILE*   mockfile= new_mockfile(tmpstr);
 
         yyin = mockfile;
-        REQUIRE(yylex() == IDENTIFIER);
+        REQUIRE(yylex() == IDtok);
 
         finish_yyin_to_eof();
         del_mockfile(mockfile);
@@ -85,20 +85,20 @@ SCENARIO("identifier"){
         FILE*   mockfile= new_mockfile(tmpstr);
 
         yyin = mockfile;
-        REQUIRE(yylex() == IDENTIFIER);
-        REQUIRE(yylex() == IDENTIFIER);
+        REQUIRE(yylex() == IDtok);
+        REQUIRE(yylex() == IDtok);
 
         finish_yyin_to_eof();
         del_mockfile(mockfile);
     }
 
-    SECTION("integers and identifier differnce"){
+    SECTION("integers and IDtok differnce"){
         char    tmpstr[]= "134234 243-sde";
         FILE*   mockfile= new_mockfile(tmpstr);
 
         yyin = mockfile;
-        REQUIRE(yylex() == INTEGER);
-        REQUIRE(yylex() == IDENTIFIER);
+        REQUIRE(yylex() == INTtok);
+        REQUIRE(yylex() == IDtok);
 
         finish_yyin_to_eof();
         del_mockfile(mockfile);
@@ -124,8 +124,8 @@ SCENARIO("identifier"){
 
         yyin = mockfile;
         REQUIRE(yylex() == '(');
-        REQUIRE(yylex() == INTEGER);
-        REQUIRE(yylex() == INTEGER);
+        REQUIRE(yylex() == INTtok);
+        REQUIRE(yylex() == INTtok);
         REQUIRE(yylex() == ')');
 
         finish_yyin_to_eof();
@@ -136,8 +136,8 @@ SCENARIO("identifier"){
         FILE*   mockfile= new_mockfile(tmpstr);
 
         yyin = mockfile;
-        REQUIRE(yylex() == BOOL);
-        REQUIRE(yylex() == BOOL);
+        REQUIRE(yylex() == BOOLtok);
+        REQUIRE(yylex() == BOOLtok);
 
         finish_yyin_to_eof();
         del_mockfile(mockfile);
@@ -149,11 +149,29 @@ SCENARIO("identifier"){
 
         yyin = mockfile;
         REQUIRE(yylex() == '(');
-        REQUIRE(yylex() == IF);
+        REQUIRE(yylex() == IFtok);
         REQUIRE(yylex() == '(');
-        REQUIRE(yylex() == IDENTIFIER);
-        REQUIRE(yylex() == INTEGER);
-        REQUIRE(yylex() == INTEGER);
+        REQUIRE(yylex() == IDtok);
+        REQUIRE(yylex() == INTtok);
+        REQUIRE(yylex() == INTtok);
+
+        finish_yyin_to_eof();
+        del_mockfile(mockfile);
+    }
+
+    SECTION("float"){
+        char    tmpstr[]= "(+ 12.49 -0.1 +0.3 1. .45)";
+        FILE*   mockfile= new_mockfile(tmpstr);
+
+        yyin = mockfile;
+        CHECK(yylex() == '(');
+        CHECK(yylex() == IDtok);
+        CHECK(yylex() == FLOATtok);
+        CHECK(yylex() == FLOATtok);
+        CHECK(yylex() == FLOATtok);
+        CHECK(yylex() == FLOATtok);
+        CHECK(yylex() == FLOATtok);
+        CHECK(yylex() == ')');
 
         finish_yyin_to_eof();
         del_mockfile(mockfile);

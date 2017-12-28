@@ -16,43 +16,33 @@ typedef long long Value;
 extern const Value UNKNOWN_VAL; // UNKNOWN_VALUE is conflict with yacc! 
 extern const void* NO_NAME;
 
-typedef enum PrevEdges { // L: car, R: cdr.
+typedef enum State { // L: car, R: cdr.
     RR = 0, 
     RL, 
     LL,
     LR,
-} PrevEdges;
-
-typedef enum Hint { // it is NOT the type of data!
-    NO_CHILD,   //0
-    DEFINE_ATOM,
-    IF_ATOM,
-    INT_ATOM,
-    ID_ATOM,
-    BOOL_ATOM,
-    END_PAIR, // pair: [car,nil]
-    EXPR_PAIR,// pair: [car,cdr]
-} Hint;
+    LAMBDAstate,
+    DEFstate,
+    IFstate,
+} State;
 
 typedef enum Type{
     INT = 0,
+    FLOAT,
+    FUNC,   // APPLICABLE 1!
+    BOOL,
+    PAIR,
+    NUMBER,
     GENERIC,
-    EXPR,
-    FUNC, // only one APPLICABLE!
-    EXPR_LIST,
-    DISP_NODE,
-    DEFINE_TYPE,
-    IF_TYPE,
-    BOOL_TYPE,
-    NULL_NODE,
+    SPECIAL,// APPLICABLE 2!
 } Type;
 
 typedef struct Node {
     char*           name;
-    Hint            hint;
     Type            type;
     Value           value;
-    int             argnum; // 최적화..
+    Value           auxval;
+    //int             argnum; // 최적화..
     struct Node*    child[NUM_CHILD];
 } Node;
 
@@ -61,8 +51,8 @@ Node*   new_node2(Node* node1, Node* node2, char* str1);
 //Node*   new_node3(Node* node1, Node* node2, Node* node3, char* str1);
 //Node*   new_node4(Node* node1, Node* node2, Node* node3, Node* node4, char* str1);
 
-Node*   atom(char* name, Type type, Value value, Hint hint);
-Node*   pair(char* name, Type type, Value value, Hint hint, 
+Node*   atom(char* name, Type type, Value value, Value auxval);
+Node*   pair(char* name, Type type, Value value, Value auxval, 
              Node* car, Node* cdr);
 
 void    pretty_print(Node* tree, int depth);
@@ -70,8 +60,8 @@ void    del_tree(Node** root);
 
 int     list_len(Node* list);
 
-PrevEdges push_car(PrevEdges edges);
-PrevEdges push_cdr(PrevEdges edges);
+State   push_car(State edges);
+State   push_cdr(State edges);
 
 Node*   copy_tree(Node* tree);
 #endif

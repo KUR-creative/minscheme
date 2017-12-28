@@ -12,20 +12,18 @@ using std::endl;
 // update symbol 
 // get symbol info(what?)
 TEST_CASE("get unbound symbol -> set error flag"){
-    Value value = 0;
-    Type type;
-    int errflag = get_from_symtab("asd", &type,  &value);
+    int errflag = get_from_symtab("asd", NULL, NULL, NULL);
     REQUIRE(errflag == UNBOUND_VARIABLE);
 }
 
 TEST_CASE("add symbol"){
     Value expected = 14;
     char name[] = "as-df";
-    add_to_symtab(name, INT, expected);
+    add_to_symtab(name, INT, expected, 0);
 
-    Value actual = 0;
     Type type;
-    int errflag = get_from_symtab(name, &type, &actual);
+    Value actual = 0;
+    int errflag = get_from_symtab(name, &type, &actual, NULL);
     REQUIRE(errflag == NO_ERR);
     REQUIRE(actual == expected);
 }
@@ -35,12 +33,12 @@ TEST_CASE("update symbol: re-binding ocurred."){
     Value expected = 14;
     char name[] = "new";
 
-    add_to_symtab(name, INT, old);
-    add_to_symtab(name, INT, expected);
+    add_to_symtab(name, INT, old, 0);
+    add_to_symtab(name, INT, expected, 0);
 
-    Value actual = 0;
     Type type;
-    int errflag = get_from_symtab(name, &type, &actual);
+    Value actual = 0;
+    int errflag = get_from_symtab(name, &type, &actual, NULL);
     REQUIRE(errflag == NO_ERR);
     REQUIRE(actual == expected);
 }

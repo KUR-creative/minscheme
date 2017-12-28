@@ -69,7 +69,7 @@ public:
 
 TEST_CASE_METHOD(IOFixture, "define function"){
     set_prog_src("(define (f arg) arg) (disp (f 3))",true);
-    pretty_print(syntax_tree,0);
+    //pretty_print(syntax_tree,0);
     REQUIRE_THAT( actual(), Equals("3") );
 }
 TEST_CASE_METHOD(IOFixture, "define if"){
@@ -88,7 +88,7 @@ TEST_CASE_METHOD(IOFixture, "define if, call","[.]"){
 TEST_CASE_METHOD(IOFixture, "get factorial definition tree"){
     set_prog_src("(define (fac n) (if (= n 1) 1 (mul2 n (fac (sub2 n 1))))) (fac 4) (disp (fac 5))",true);
     cout << "after interpret" << endl;
-    pretty_print(syntax_tree,0);
+    //pretty_print(syntax_tree,0);
     cout << "--------------" << endl;
     // just look and feel: pretty_print
 }
@@ -237,7 +237,7 @@ TEST_CASE_METHOD(IOFixture, "define: function"){
 TEST_CASE_METHOD(IOFixture, "define: function, and call"){
     set_prog_src("(define (func a b) (add2 a b)) (disp (func 3 4))", true);
     cout << "===== after interpret =====" << endl;
-    pretty_print(syntax_tree,0);
+    //pretty_print(syntax_tree,0);
     Value retval = 0;
     Type type;
     int argnum;
@@ -375,7 +375,7 @@ TEST_CASE_METHOD(IOFixture, "disp must be called 1 arguments."){
 
 TEST_CASE_METHOD(IOFixture, "disp: arg type is int"){
     set_prog_src("(disp disp)");
-    pretty_print(syntax_tree,0);
+    //pretty_print(syntax_tree,0);
     // skip this case. just no segfault.
     //REQUIRE_THAT( actual(), Equals(string("(disp disp)")
                                   //+string(type_mismatch_errmsg)) );
@@ -383,13 +383,13 @@ TEST_CASE_METHOD(IOFixture, "disp: arg type is int"){
 /* // TODO:
 TEST_CASE_METHOD(IOFixture, "add2:int x int -> int"){
     set_prog_src("(add2 sub2 sub2)");
-    pretty_print(syntax_tree,0);
+    //pretty_print(syntax_tree,0);
     REQUIRE_THAT( actual(), Equals(string("(add2 sub2 sub2)")
                                   +string(type_mismatch_errmsg)) );
 }
 TEST_CASE_METHOD(IOFixture, "error aborts the evaluation."){
     set_prog_src("(add2 add2 4)");
-    pretty_print(syntax_tree,0);
+    //pretty_print(syntax_tree,0);
     REQUIRE_THAT( actual(), Equals(string("(add2 add2 4)")
                                   +string(type_mismatch_errmsg)) );
 }
