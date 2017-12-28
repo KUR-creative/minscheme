@@ -12,6 +12,10 @@
 #define cdr(p)      ( ((Node*)p)->child[1])  // unsafe!
 #define caadr(p)    ( ((Node*)p)->child[1]->child[0]->child[0]) 
 
+
+#define double_to_Value(double_lval) *(long long*)(&(double_lval))
+#define Value_to_double(lvalue)      *(double*)(&(lvalue))
+
 typedef long long Value;
 extern const Value UNKNOWN_VAL; // UNKNOWN_VALUE is conflict with yacc! 
 extern const void* NO_NAME;
@@ -38,6 +42,8 @@ typedef enum Type{
     SPECIAL,// APPLICABLE 2!
     NO_TYPE,
 } Type;
+
+extern const Value UNKNOWN_VAL;
 
 typedef struct Node {
     char*           name;

@@ -6,6 +6,7 @@
 #include <string.h> 
 #include <string>
 #include <stack>
+#include <tuple>
 
 Node* syntax_tree = NULL;
 
@@ -15,12 +16,16 @@ extern FILE *yyout;
 }
 
 using std::stack;
+using std::tuple;
+using std::make_tuple;
 using std::string;
 using std::cout;
 using std::endl;
 
+//Node temp_node = {0,};
+stack<tuple<Node,int,int>> run_stack;
 
-State interpret(Node* parse_tree, State state)
+State interpret(Node* node, State state)
 {
     //State car_state = NOstate;
     if( car(node) != NULL ){
@@ -31,6 +36,15 @@ State interpret(Node* parse_tree, State state)
     }
 
     if(state == LL){
+        char* name = node->name;
+        Type type = node->type;
+        Value val = node->value;
+
+        get_from_symtab(name, &type, &val);
+        auto arglist = get_arglist(val);
+        int argnum = list_len(arglist);
+
+        run_stack.push( make_tuple(*node,argnum,0) );
     }
     Value val;
     get_from_symtab("add2", NULL, &val);
@@ -41,6 +55,7 @@ State interpret(Node* parse_tree, State state)
 
     auto func = (Val_Val)get_body(val);
     //func(
+    return state;
 }
 
 //static char tmpstrbuf[32] = {0,};

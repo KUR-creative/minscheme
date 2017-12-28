@@ -41,6 +41,11 @@ expr:
         '(' pair ')'    { $$ = $2; }
     |   INTtok          { long long val = strtoll(yytext, NULL, 10);
                           $$ = atom(yytext, INT, val); }
+    |   FLOATtok        { long long val;
+                          double double_val = atof(yytext);
+                          //val = *(long long*)(&double_val);// no cast!
+                          val = double_to_Value(double_val);// no cast!
+                          $$ = atom(yytext, INT, val); }
     |   IDtok           { $$ = atom(yytext, GENERIC, UNKNOWN_VAL); }
     |   DEFtok          { $$ = atom("define", SPECIAL, UNKNOWN_VAL); }
     |   BOOLtok         { long long val = ((yytext[1] == 't') ? 1 : 0);

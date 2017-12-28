@@ -84,3 +84,24 @@ TEST_CASE("run with function pointer"){
 
     deinit_symtab();
 }
+
+TEST_CASE("display"){
+    init_symtab();
+
+    Value val;
+    get_from_symtab("display", NULL, &val);
+
+    auto arglist = get_arglist(val);
+    REQUIRE(car(arglist)->type == GENERIC);
+
+    auto fp = (pNode_Val)get_body(val);
+
+    Node* integer = atom("int", INT, 123ll);
+    Node* boolean = atom("bool", BOOL, 0l);
+    double tmpfloat = 3254.6752;
+    Node* floatnum = atom("float", FLOAT, double_to_Value(tmpfloat));
+    //fp(integer);
+    //fp(boolean);
+    //fp(floatnum);
+    deinit_symtab();
+}
