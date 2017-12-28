@@ -20,8 +20,27 @@ using std::cout;
 using std::endl;
 
 
-Type interpret(Node* parse_tree, State state)
+State interpret(Node* parse_tree, State state)
 {
+    //State car_state = NOstate;
+    if( car(node) != NULL ){
+        interpret(car(node), push_car(state));
+    }
+    if( cdr(node) != NULL ){
+        interpret(cdr(node), push_car(state));
+    }
+
+    if(state == LL){
+    }
+    Value val;
+    get_from_symtab("add2", NULL, &val);
+
+    auto arglist = get_arglist(val);
+    //REQUIRE(car(arglist)->type == INT);
+    //REQUIRE(cadr(arglist)->type == INT);
+
+    auto func = (Val_Val)get_body(val);
+    //func(
 }
 
 //static char tmpstrbuf[32] = {0,};

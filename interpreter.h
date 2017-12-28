@@ -9,7 +9,7 @@ extern "C"
 #include "simp-tree.h"
 
 extern Node* syntax_tree;
-Type interpret(Node* parse_tree, State state);
+State interpret(Node* parse_tree, State state);
 
 #ifdef __cplusplus
 }

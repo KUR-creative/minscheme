@@ -24,6 +24,7 @@ typedef enum State { // L: car, R: cdr.
     LAMBDAstate,
     DEFstate,
     IFstate,
+    NOstate, // for initialization.
 } State;
 
 typedef enum Type{

@@ -74,12 +74,13 @@ TEST_CASE("run with function pointer"){
     Value val;
     get_from_symtab("add2", NULL, &val);
 
+    auto arglist = get_arglist(val);
+    REQUIRE(car(arglist)->type == INT);
+    REQUIRE(cadr(arglist)->type == INT);
+
     auto fp = (ValxVal_Val)get_body(val);
     Value result = fp(1ll,2ll);
     REQUIRE(result == 3ll);
 
-    auto arglist = get_arglist(val);
-    REQUIRE(car(arglist)->type == INT);
-    REQUIRE(cadr(arglist)->type == INT);
     deinit_symtab();
 }

@@ -27,6 +27,7 @@ extern int yylex(void);
 /*
 */
 TEST_CASE("get function pointer(body) of primitive function."){
+    init_symtab();
     Type type;
     Value value;
     int err = get_from_symtab("add2", &type, &value);
@@ -36,6 +37,7 @@ TEST_CASE("get function pointer(body) of primitive function."){
     REQUIRE(fp(1ll,2ll) == 3ll);
     //ValxVal_Val fp = add2;
     //printf("[%lld]", fp(1ll, 2ll));
+    deinit_symtab();
 }
 
 class IOFixture {
@@ -82,7 +84,7 @@ public:
 };
 
 TEST_CASE_METHOD(IOFixture, "display 1, display is function."){
-    set_prog_src("(display 123)");
+    set_prog_src("(display 123)",true);
     auto root = syntax_tree;
     REQUIRE_THAT( actual(), Equals("123") );
 }
