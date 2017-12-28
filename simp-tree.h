@@ -5,12 +5,12 @@
 
 #define NUM_CHILD   2
 // unsafe!
-#define car(p) ((p)->child[0])  // list[0]
-#define cadr(p) ((p)->child[1]->child[0]) // list[1]
-#define caddr(p) ((p)->child[1]->child[1]->child[0]) // list[2]
-#define cadddr(p) ((p)->child[1]->child[1]->child[1]->child[0]) // list[3]
-#define cdr(p) ((p)->child[1])  // unsafe!
-#define caadr(p) ((p)->child[1]->child[0]->child[0]) 
+#define car(p)      ( ((Node*)p)->child[0])  // list[0]
+#define cadr(p)     ( ((Node*)p)->child[1]->child[0]) // list[1]
+#define caddr(p)    ( ((Node*)p)->child[1]->child[1]->child[0]) // list[2]
+#define cadddr(p)   ( ((Node*)p)->child[1]->child[1]->child[1]->child[0]) // list[3]
+#define cdr(p)      ( ((Node*)p)->child[1])  // unsafe!
+#define caadr(p)    ( ((Node*)p)->child[1]->child[0]->child[0]) 
 
 typedef long long Value;
 extern const Value UNKNOWN_VAL; // UNKNOWN_VALUE is conflict with yacc! 
@@ -35,13 +35,13 @@ typedef enum Type{
     NUMBER,
     GENERIC,
     SPECIAL,// APPLICABLE 2!
+    NO_TYPE,
 } Type;
 
 typedef struct Node {
     char*           name;
     Type            type;
     Value           value;
-    Value           auxval;
     //int             argnum; // 최적화..
     struct Node*    child[NUM_CHILD];
 } Node;
@@ -51,8 +51,8 @@ Node*   new_node2(Node* node1, Node* node2, char* str1);
 //Node*   new_node3(Node* node1, Node* node2, Node* node3, char* str1);
 //Node*   new_node4(Node* node1, Node* node2, Node* node3, Node* node4, char* str1);
 
-Node*   atom(char* name, Type type, Value value, Value auxval);
-Node*   pair(char* name, Type type, Value value, Value auxval, 
+Node*   atom(char* name, Type type, Value value);
+Node*   pair(char* name, Type type, Value value, 
              Node* car, Node* cdr);
 
 void    pretty_print(Node* tree, int depth);

@@ -22,16 +22,29 @@ extern void yyerror(char *);
 extern int yylex(void);
 }
 
-// DO NOT call yylex anymore!
-void finish_yyin_to_eof(void){
-    while(yylex() != 0);
+
+
+/*
+*/
+TEST_CASE("get function pointer(body) of primitive function."){
+    Type type;
+    Value value;
+    int err = get_from_symtab("add2", &type, &value);
+    REQUIRE(err != UNBOUND_VARIABLE);
+
+    auto fp = (ValxVal_Val)get_body(value);
+    REQUIRE(fp(1ll,2ll) == 3ll);
+    //ValxVal_Val fp = add2;
+    //printf("[%lld]", fp(1ll, 2ll));
 }
 
 class IOFixture {
     FILE*   prog_outfile;
     bool    actual_called;
 public:
-    IOFixture(): actual_called(false){;}
+    IOFixture(): actual_called(false) {
+        init_symtab();
+    }
     void set_prog_src(char* prog_src, bool print = false){
         FILE*   mockfile= new_mockfile(prog_src);
         FILE*   outfile = Fopen("out", "w");
@@ -44,7 +57,7 @@ public:
             cout << prog_src << endl;
             cout << "--------------------------------\n";
         }
-        interpret(syntax_tree, TOP_LIST, RR);
+        interpret(syntax_tree, RR);
 
         del_mockfile(mockfile);
         Fclose(outfile);
@@ -58,6 +71,7 @@ public:
     }
 
     ~IOFixture() {
+        deinit_symtab();
         if( ! actual_called )
             actual();
         Fclose(prog_outfile);
@@ -67,8 +81,31 @@ public:
     }
 };
 
+TEST_CASE_METHOD(IOFixture, "display 1, display is function."){
+    set_prog_src("(display 123)");
+    auto root = syntax_tree;
+    REQUIRE_THAT( actual(), Equals("123") );
+}
+/*
+TEST_CASE_METHOD(IOFixture, "display other"){
+    set_prog_src("(display 264)");
+    REQUIRE_THAT( actual(), Equals("264") );
+}
+TEST_CASE_METHOD(IOFixture, "display minus"){
+    set_prog_src("(display -523)");
+    REQUIRE_THAT( actual(), Equals("-523") );
+}
+
+TEST_CASE_METHOD(IOFixture, "multiple display"){
+    set_prog_src("(display 1)(display 234)");
+    REQUIRE_THAT( actual(), Equals("1234") );
+}
+TEST_CASE_METHOD(IOFixture, "multiline display"){
+    set_prog_src("(display 451)\n(display 452)");
+    REQUIRE_THAT( actual(), Equals("451452") );
+}
 TEST_CASE_METHOD(IOFixture, "define function"){
-    set_prog_src("(define (f arg) arg) (disp (f 3))",true);
+    set_prog_src("(define (f arg) arg) (display (f 3))",true);
     //pretty_print(syntax_tree,0);
     REQUIRE_THAT( actual(), Equals("3") );
 }
@@ -78,15 +115,14 @@ TEST_CASE_METHOD(IOFixture, "define if"){
     REQUIRE_THAT( actual(), Equals("") );
 }
 TEST_CASE_METHOD(IOFixture, "define if, call","[.]"){
-    set_prog_src("(define (f arg) (if arg 3 -4)) (disp (f #t))",true);
+    set_prog_src("(define (f arg) (if arg 3 -4)) (display (f #t))",true);
     //pretty_print(syntax_tree,0);
     REQUIRE_THAT( actual(), Equals("3") );
 }
 
 // 치환은 eval과 함께 이루어져야 한다.....
-/*
 TEST_CASE_METHOD(IOFixture, "get factorial definition tree"){
-    set_prog_src("(define (fac n) (if (= n 1) 1 (mul2 n (fac (sub2 n 1))))) (fac 4) (disp (fac 5))",true);
+    set_prog_src("(define (fac n) (if (= n 1) 1 (mul2 n (fac (sub2 n 1))))) (fac 4) (display (fac 5))",true);
     cout << "after interpret" << endl;
     //pretty_print(syntax_tree,0);
     cout << "--------------" << endl;
@@ -97,7 +133,7 @@ TEST_CASE_METHOD(IOFixture, "look"){
     // just look and feel: pretty_print
 }
 TEST_CASE_METHOD(IOFixture, "get factorial call tree"){
-    set_prog_src("(disp (fac 5))\n(disp 3)(disp (fac 4))");
+    set_prog_src("(display (fac 5))\n(display 3)(display (fac 4))");
     // just look and feel: pretty_print
 }
 TEST_CASE_METHOD(IOFixture, "get parse tree 1"){
@@ -114,49 +150,19 @@ TEST_CASE_METHOD(IOFixture, "get parse tree 3"){
 }
 
 TEST_CASE_METHOD(IOFixture, "add2"){
-    set_prog_src("(define (add2 a b) (+ a b)) (disp (add2 1 6))");
+    set_prog_src("(define (add2 a b) (+ a b)) (display (add2 1 6))");
     // just look and feel: pretty_print
 }
 
-TEST_CASE("pair-[disp,p]"){
+TEST_CASE("pair-[display,p]"){
     Node* node = pair("pair", GENERIC, UNKNOWN_VAL, EXPR_PAIR,
-                     atom("disp", DISP_NODE, UNKNOWN_VAL, ID_ATOM),
+                     atom("display", DISP_NODE, UNKNOWN_VAL, ID_ATOM),
                      pair("end-pair", GENERIC, UNKNOWN_VAL, END_PAIR, 
                          atom("10", INT, 10, INT_ATOM), NULL));
     Hint hint = interpret(node);
     //REQUIRE(hint = 
 }
-*/
 
-TEST_CASE_METHOD(IOFixture, "check hints 1","[.]"){ // it is maybe useless.
-    set_prog_src("(disp 1)");
-    auto root = syntax_tree;
-    REQUIRE( root->hint == END_PAIR );
-    REQUIRE( car(root)->hint == EXPR_PAIR );
-    REQUIRE( car(car(root))->hint == ID_ATOM);
-}
-TEST_CASE_METHOD(IOFixture, "disp 1, disp is function."){
-    set_prog_src("(disp 1)");
-    auto root = syntax_tree;
-    REQUIRE_THAT( actual(), Equals("1") );
-}
-TEST_CASE_METHOD(IOFixture, "disp other"){
-    set_prog_src("(disp 264)");
-    REQUIRE_THAT( actual(), Equals("264") );
-}
-TEST_CASE_METHOD(IOFixture, "disp minus"){
-    set_prog_src("(disp -523)");
-    REQUIRE_THAT( actual(), Equals("-523") );
-}
-
-TEST_CASE_METHOD(IOFixture, "multiple disp"){
-    set_prog_src("(disp 1)(disp 234)");
-    REQUIRE_THAT( actual(), Equals("1234") );
-}
-TEST_CASE_METHOD(IOFixture, "multiline disp"){
-    set_prog_src("(disp 451)\n(disp 452)");
-    REQUIRE_THAT( actual(), Equals("451452") );
-}
 
 TEST_CASE_METHOD(IOFixture, "unbound variable error","[.]"){
     // it should be parsed. it is SEMANTIC error.
@@ -164,7 +170,7 @@ TEST_CASE_METHOD(IOFixture, "unbound variable error","[.]"){
     REQUIRE_THAT( actual(), Equals(string("unbound-id")
                                   +string(unbound_variable_errmsg)));
 }
-/* 
+
 TEST_CASE_METHOD(IOFixture, "unbound variable error2"){
     // it should be parsed. it is SEMANTIC error.
     set_prog_src("(unbound-id2 unde3)");
@@ -173,7 +179,6 @@ TEST_CASE_METHOD(IOFixture, "unbound variable error2"){
                                   +string("unde3")
                                   +string(unbound_variable_errmsg)));
 }
-*/
 TEST_CASE_METHOD(IOFixture, "define: must be used with 2 expressions."){
     set_prog_src("(define newid 12 43)");
     REQUIRE_THAT( actual(), Equals(string("define")
@@ -194,7 +199,7 @@ TEST_CASE_METHOD(IOFixture, "define: add new symbol to symtab"){
     REQUIRE(retval == 12);
 }
 TEST_CASE_METHOD(IOFixture, "define: enviroment, and use id"){
-    set_prog_src("(define identifier 846)(disp identifier)");
+    set_prog_src("(define identifier 846)(display identifier)");
 
     REQUIRE_THAT( actual(), Equals("846") );
 
@@ -235,7 +240,7 @@ TEST_CASE_METHOD(IOFixture, "define: function"){
     REQUIRE_THAT( car(body_ptr)->name , Equals("add2")); 
 }
 TEST_CASE_METHOD(IOFixture, "define: function, and call"){
-    set_prog_src("(define (func a b) (add2 a b)) (disp (func 3 4))", true);
+    set_prog_src("(define (func a b) (add2 a b)) (display (func 3 4))", true);
     cout << "===== after interpret =====" << endl;
     //pretty_print(syntax_tree,0);
     Value retval = 0;
@@ -258,61 +263,61 @@ TEST_CASE_METHOD(IOFixture, "copy tree"){
     // copyed! maybe...
 }
 
-//(if #f (disp 1)(disp 0))
+//(if #f (display 1)(display 0))
 TEST_CASE_METHOD(IOFixture, "if: selection"){
-    set_prog_src("(if #t (disp 1)(disp 0)) ");
+    set_prog_src("(if #t (display 1)(display 0)) ");
     REQUIRE_THAT( actual(), Equals("1") );
 }
 TEST_CASE_METHOD(IOFixture, "if: selection - false"){
-    set_prog_src("(if #f (disp 1)(disp 0)) ");
+    set_prog_src("(if #f (display 1)(display 0)) ");
     REQUIRE_THAT( actual(), Equals("0") );
 }
 TEST_CASE_METHOD(IOFixture, "if: condition must be bool type."){
-    set_prog_src("(if 1 (disp 1)(disp 0))");
+    set_prog_src("(if 1 (display 1)(display 0))");
     REQUIRE_THAT( actual(), Equals(string("if")
                                   +string(type_mismatch_errmsg)) );
 }
 TEST_CASE_METHOD(IOFixture, "if: result can be any type."){
-    set_prog_src("(disp (if #t 1 #f)) (disp (if #f 1 #f))");
+    set_prog_src("(display (if #t 1 #f)) (display (if #f 1 #f))");
     REQUIRE_THAT( actual(), Equals("1false") );
 }
 TEST_CASE_METHOD(IOFixture, "if: recursive evaluation."){
-    set_prog_src("(disp (if #t (add2 3 4) #f))");
+    set_prog_src("(display (if #t (add2 3 4) #f))");
     REQUIRE_THAT( actual(), Equals("7") );
 }
 TEST_CASE_METHOD(IOFixture, "if: recursive evaluation2."){
-    set_prog_src("(disp (if (= 4 4) (add2 3 4) #f))");
+    set_prog_src("(display (if (= 4 4) (add2 3 4) #f))");
     REQUIRE_THAT( actual(), Equals("7") );
 }
 
 //primitives             
 TEST_CASE_METHOD(IOFixture, "=: int x int -> bool"){
-    set_prog_src("(disp (= 1 1))");
+    set_prog_src("(display (= 1 1))");
     REQUIRE_THAT( actual(), Equals("true") );
 }
 TEST_CASE_METHOD(IOFixture, "bool: #t"){
     set_prog_src("#t");
     REQUIRE_THAT( actual(), Equals("") );
 }
-TEST_CASE_METHOD(IOFixture, "disp bool: #t"){
-    set_prog_src("(disp #t)(newline)(disp #f)");
+TEST_CASE_METHOD(IOFixture, "display bool: #t"){
+    set_prog_src("(display #t)(newline)(display #f)");
     REQUIRE_THAT( actual(), Equals("true\nfalse") );
 }
 
 TEST_CASE_METHOD(IOFixture, "add2 = arg1 + arg2"){
-    set_prog_src("(disp (add2 2 4))");
+    set_prog_src("(display (add2 2 4))");
     REQUIRE_THAT( actual(), Equals("6") );
 }
 TEST_CASE_METHOD(IOFixture, "sub2 = arg1 - arg2"){
-    set_prog_src("(disp (sub2 2 40))");
+    set_prog_src("(display (sub2 2 40))");
     REQUIRE_THAT( actual(), Equals("-38") );
 }
 TEST_CASE_METHOD(IOFixture, "recursive calculation 1"){
-    set_prog_src("(disp (add2 1 (add2 2 3)))");
+    set_prog_src("(display (add2 1 (add2 2 3)))");
     REQUIRE_THAT( actual(), Equals("6") );
 }
 TEST_CASE_METHOD(IOFixture, "recursive calculation 2"){
-    set_prog_src("(disp (add2 (add2 10 40) (add2 (sub2 4 8) 3)))");
+    set_prog_src("(display (add2 (add2 10 40) (add2 (sub2 4 8) 3)))");
     REQUIRE_THAT( actual(), Equals("49") );
 }
 TEST_CASE_METHOD(IOFixture, "newline: () -> notype: output func"){
@@ -358,29 +363,29 @@ TEST_CASE_METHOD(IOFixture, "sub2 must be called 2 arguments. not 0"){
                                   +string(incorrect_argnum_errmsg)) );
 }
 TEST_CASE_METHOD(IOFixture, "mul2 = arg1 * arg2"){
-    set_prog_src("(disp (mul2 2 4))");
+    set_prog_src("(display (mul2 2 4))");
     REQUIRE_THAT( actual(), Equals("8") );
 }
 TEST_CASE_METHOD(IOFixture, "div2 = arg1 / arg2"){
-    set_prog_src("(disp (div2 8 4))");
+    set_prog_src("(display (div2 8 4))");
     REQUIRE_THAT( actual(), Equals("2") );
 }
 
-TEST_CASE_METHOD(IOFixture, "disp must be called 1 arguments."){
-    set_prog_src("(disp 1 2)");
-    REQUIRE_THAT( actual(), Equals(string("disp")
+TEST_CASE_METHOD(IOFixture, "display must be called 1 arguments."){
+    set_prog_src("(display 1 2)");
+    REQUIRE_THAT( actual(), Equals(string("display")
                                   +string(incorrect_argnum_errmsg)) );
 }
 // primitive function checks the type equivalence.
 
-TEST_CASE_METHOD(IOFixture, "disp: arg type is int"){
-    set_prog_src("(disp disp)");
+TEST_CASE_METHOD(IOFixture, "display: arg type is int"){
+    set_prog_src("(display display)");
     //pretty_print(syntax_tree,0);
     // skip this case. just no segfault.
-    //REQUIRE_THAT( actual(), Equals(string("(disp disp)")
+    //REQUIRE_THAT( actual(), Equals(string("(display display)")
                                   //+string(type_mismatch_errmsg)) );
 }
-/* // TODO:
+// TODO:
 TEST_CASE_METHOD(IOFixture, "add2:int x int -> int"){
     set_prog_src("(add2 sub2 sub2)");
     //pretty_print(syntax_tree,0);
@@ -393,16 +398,16 @@ TEST_CASE_METHOD(IOFixture, "error aborts the evaluation."){
     REQUIRE_THAT( actual(), Equals(string("(add2 add2 4)")
                                   +string(type_mismatch_errmsg)) );
 }
-*/
+
 TEST_CASE_METHOD(IOFixture, "if func is arg, then don't eval the func.","[.]"){
-    set_prog_src("(add2 disp 4)");
-    REQUIRE_THAT( actual(), Equals(string("(add2 disp 4)")
+    set_prog_src("(add2 display 4)");
+    REQUIRE_THAT( actual(), Equals(string("(add2 display 4)")
                                   +string(type_mismatch_errmsg)) );
 }
 
 // later..
 TEST_CASE_METHOD(IOFixture, "critical error aborts the execution","[.]"){
-    set_prog_src("unbound-id (disp 3) (disp -5)");
+    set_prog_src("unbound-id (display 3) (display -5)");
     REQUIRE_THAT( actual(), Equals(string("unbound-id")
                                   +string(unbound_variable_errmsg)) );
 }
@@ -412,9 +417,9 @@ TEST_CASE_METHOD(IOFixture, "calculation"){
     set_prog_src("(define a 12)     \
                   (define b 24)     \
                   (define c  2)     \
-                  (disp (add2 a b)) \
+                  (display (add2 a b)) \
                   (newline)         \
-                  (disp (sub2 b c))");
+                  (display (sub2 b c))");
     REQUIRE_THAT( actual(), Equals("36\n22") );
 }
 
@@ -422,9 +427,10 @@ TEST_CASE_METHOD(IOFixture, "calculation2"){
     set_prog_src("(define a 12)     \
                   (define b 24)     \
                   (define c  2)     \
-                  (disp (add2 a (add2 b c))) \
+                  (display (add2 a (add2 b c))) \
                   (newline)         \
-                  (disp (sub2 b (sub2 c a)))");
+                  (display (sub2 b (sub2 c a)))");
     REQUIRE_THAT( actual(), Equals("38\n34") );
 }
 
+*/

@@ -16,7 +16,8 @@ ft: # full program (lex + parse)
 
 st: # symtab test
 	make compile
-	g++ -std=c++11 -o symtab-test symtab-test.cpp symtab.o
+	make symtab-test.o
+	g++ -std=c++11 -o symtab-test symtab-test.o $(OBJS)
 	./symtab-test
 
 stt: # simp-tree test
@@ -25,7 +26,7 @@ stt: # simp-tree test
 	g++ -std=c++11 -o simp-tree-test simp-tree-test.o $(OBJS)
 	./simp-tree-test
 
-it: # interpreter test
+t: # interpreter test
 	make compile
 	make interpreter-test.o
 	g++ -std=c++11 -o interpreter-test interpreter-test.o $(OBJS)
@@ -37,7 +38,7 @@ lt: # lexer test
 	g++ -std=c++11 -o lexer-test lexer-test.o $(OBJS)
 	./lexer-test
 
-t: # parser test
+pt: # parser test
 	make compile
 	make parser-test.o
 	g++ -std=c++11 -o parser-test parser-test.o $(OBJS)
@@ -49,6 +50,8 @@ ta: # test all
 	make it
 
 ######################################################################## 
+symtab-test.o: symtab-test.cpp
+	g++ -std=c++11 $(CFLAGS) -c symtab-test.cpp
 interpreter-test.o: interpreter-test.cpp
 	g++ -std=c++11 $(CFLAGS) -c interpreter-test.cpp
 simp-tree-test.o: simp-tree-test.cpp

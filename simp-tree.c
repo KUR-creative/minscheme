@@ -67,7 +67,7 @@ Node*   new_node4(Node* node1, Node* node2, Node* node3, Node* node4,
 
 // INT has no name = NULL
 // GENERIC has name != NULL
-Node*   atom(char* name, Type type, Value value, Value auxval)
+Node*   atom(char* name, Type type, Value value)
 {
     Node*   ret = Calloc(1,sizeof(Node));
     if(name != NO_NAME) {
@@ -75,22 +75,21 @@ Node*   atom(char* name, Type type, Value value, Value auxval)
     }
     ret->type = type;
     ret->value = value;
-    ret->auxval = auxval;
     return ret;
 }
 
-Node*   pair(char* name, Type type, Value value, Value auxval, 
-             Node* car, Node* cdr)
+
+Node*   pair(char* name, Type type, Value value, 
+             Node* car_node, Node* cdr_node)
 {
     Node*   ret = Calloc(1,sizeof(Node));
-    ret->child[0] = car;
-    ret->child[1] = cdr;
+    ret->child[0] = car_node;
+    ret->child[1] = cdr_node;
     if(name != NO_NAME) {
         ret->name = strdup(name);
     }
     ret->type = type;
     ret->value = value;
-    ret->auxval = auxval;
     return ret;
 }
 
@@ -175,7 +174,6 @@ Node*   copy_tree(Node* tree)
     Node* ret_tree = NULL;
     if(tree != NULL){
         ret_tree = new_node2(NULL, NULL, tree->name);
-        ret_tree->auxval = tree->auxval;
         ret_tree->type = tree->type;
         ret_tree->value = tree->value;
         //ret_tree->argnum = tree->argnum;

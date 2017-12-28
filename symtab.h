@@ -7,16 +7,20 @@ extern "C"
 #endif
 
 #include "simp-tree.h"
+typedef Value (*ValxVal_Val)(Value,Value);
+void* get_body(Value bodyptr);
+Node* get_arglist(Value value);
 
 typedef struct Entry {
     Type    type;
     Value   value;
-    Value   auxval;
 } Entry;
 
+void init_symtab(void);
+void deinit_symtab(void);
 // return value is error code.
-int get_from_symtab(char* key, Type* rettype, Value* retval, int* retauxval); 
-int add_to_symtab(char* key, Type type, Value value, int auxval); 
+int get_from_symtab(char* key, Type* rettype, Value* retval); 
+int add_to_symtab(char* key, Type type, Value value); 
 //int get_func_from_symtab(char* key, Type* rettype, Value* retval); 
 //int add_func_to_symtab(char* key, Value bodyptr, int argnum);
 

@@ -5,18 +5,24 @@
 #include <cassert>
 #include <string.h> 
 #include <string>
+#include <stack>
 
 Node* syntax_tree = NULL;
 
 extern "C"
 {
-//#include "minscheme.tab.h"
 extern FILE *yyout;
 }
 
+using std::stack;
 using std::string;
 using std::cout;
 using std::endl;
+
+
+Type interpret(Node* parse_tree, State state)
+{
+}
 
 //static char tmpstrbuf[32] = {0,};
 /*

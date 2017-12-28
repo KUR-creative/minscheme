@@ -6,7 +6,6 @@
 
 %%
     
-"disp"                  { return DISP; }
 "define"                { return DEFtok; }
 ("#t"|"#f")             { return BOOLtok; }
 "if"                    { return IFtok; }
