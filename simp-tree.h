@@ -65,6 +65,7 @@ Node*   pair(char* name, Type type, Value value,
 
 void    pretty_print(Node* tree, int depth);
 void    del_tree(Node** root);
+void    del_node(Node** pnode);
 
 int     list_len(Node* list);
 

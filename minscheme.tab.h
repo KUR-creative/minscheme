@@ -51,7 +51,8 @@ extern int yydebug;
     DEFtok = 261,
     BOOLtok = 262,
     IFtok = 263,
-    FLOATtok = 264
+    FLOATtok = 264,
+    LAMBDAtok = 265
   };
 #endif
 
@@ -65,7 +66,7 @@ union YYSTYPE
     struct Node*    node_t;
     int             int_t;
 
-#line 69 "minscheme.tab.h" /* yacc.c:1909  */
+#line 70 "minscheme.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

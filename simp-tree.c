@@ -110,7 +110,6 @@ void    pretty_print(Node* tree, int depth)
     }
 }
 
-static
 void    del_node(Node** pnode)
 {
     Node* node = *pnode;

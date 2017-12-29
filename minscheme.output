@@ -14,12 +14,13 @@ Grammar
     4     | INTtok
     5     | FLOATtok
     6     | IDtok
-    7     | DEFtok
-    8     | BOOLtok
+    7     | BOOLtok
+    8     | DEFtok
     9     | IFtok
+   10     | LAMBDAtok
 
-   10 pair: expr
-   11     | expr pair
+   11 pair: expr
+   12     | expr pair
 
 
 Terminals, with rules where they appear
@@ -31,39 +32,41 @@ error (256)
 INTtok (258) 4
 IDtok (259) 6
 DISP (260)
-DEFtok (261) 7
-BOOLtok (262) 8
+DEFtok (261) 8
+BOOLtok (262) 7
 IFtok (263) 9
 FLOATtok (264) 5
+LAMBDAtok (265) 10
 
 
 Nonterminals, with rules where they appear
 
-$accept (12)
+$accept (13)
     on left: 0
-prog (13)
+prog (14)
     on left: 1, on right: 0
-expr (14)
-    on left: 2 3 4 5 6 7 8 9, on right: 10 11
-pair (15)
-    on left: 10 11, on right: 1 2 11
+expr (15)
+    on left: 2 3 4 5 6 7 8 9 10, on right: 11 12
+pair (16)
+    on left: 11 12, on right: 1 2 12
 
 
 State 0
 
     0 $accept: . prog $end
 
-    INTtok    shift, and go to state 1
-    IDtok     shift, and go to state 2
-    DEFtok    shift, and go to state 3
-    BOOLtok   shift, and go to state 4
-    IFtok     shift, and go to state 5
-    FLOATtok  shift, and go to state 6
-    '('       shift, and go to state 7
+    INTtok     shift, and go to state 1
+    IDtok      shift, and go to state 2
+    DEFtok     shift, and go to state 3
+    BOOLtok    shift, and go to state 4
+    IFtok      shift, and go to state 5
+    FLOATtok   shift, and go to state 6
+    LAMBDAtok  shift, and go to state 7
+    '('        shift, and go to state 8
 
-    prog  go to state 8
-    expr  go to state 9
-    pair  go to state 10
+    prog  go to state 9
+    expr  go to state 10
+    pair  go to state 11
 
 
 State 1
@@ -82,16 +85,16 @@ State 2
 
 State 3
 
-    7 expr: DEFtok .
+    8 expr: DEFtok .
 
-    $default  reduce using rule 7 (expr)
+    $default  reduce using rule 8 (expr)
 
 
 State 4
 
-    8 expr: BOOLtok .
+    7 expr: BOOLtok .
 
-    $default  reduce using rule 8 (expr)
+    $default  reduce using rule 7 (expr)
 
 
 State 5
@@ -110,84 +113,93 @@ State 6
 
 State 7
 
-    2 expr: '(' . pair ')'
-    3     | '(' . ')'
+   10 expr: LAMBDAtok .
 
-    INTtok    shift, and go to state 1
-    IDtok     shift, and go to state 2
-    DEFtok    shift, and go to state 3
-    BOOLtok   shift, and go to state 4
-    IFtok     shift, and go to state 5
-    FLOATtok  shift, and go to state 6
-    '('       shift, and go to state 7
-    ')'       shift, and go to state 11
-
-    expr  go to state 9
-    pair  go to state 12
+    $default  reduce using rule 10 (expr)
 
 
 State 8
 
-    0 $accept: prog . $end
+    2 expr: '(' . pair ')'
+    3     | '(' . ')'
 
-    $end  shift, and go to state 13
+    INTtok     shift, and go to state 1
+    IDtok      shift, and go to state 2
+    DEFtok     shift, and go to state 3
+    BOOLtok    shift, and go to state 4
+    IFtok      shift, and go to state 5
+    FLOATtok   shift, and go to state 6
+    LAMBDAtok  shift, and go to state 7
+    '('        shift, and go to state 8
+    ')'        shift, and go to state 12
+
+    expr  go to state 10
+    pair  go to state 13
 
 
 State 9
 
-   10 pair: expr .
-   11     | expr . pair
+    0 $accept: prog . $end
 
-    INTtok    shift, and go to state 1
-    IDtok     shift, and go to state 2
-    DEFtok    shift, and go to state 3
-    BOOLtok   shift, and go to state 4
-    IFtok     shift, and go to state 5
-    FLOATtok  shift, and go to state 6
-    '('       shift, and go to state 7
-
-    $default  reduce using rule 10 (pair)
-
-    expr  go to state 9
-    pair  go to state 14
+    $end  shift, and go to state 14
 
 
 State 10
+
+   11 pair: expr .
+   12     | expr . pair
+
+    INTtok     shift, and go to state 1
+    IDtok      shift, and go to state 2
+    DEFtok     shift, and go to state 3
+    BOOLtok    shift, and go to state 4
+    IFtok      shift, and go to state 5
+    FLOATtok   shift, and go to state 6
+    LAMBDAtok  shift, and go to state 7
+    '('        shift, and go to state 8
+
+    $default  reduce using rule 11 (pair)
+
+    expr  go to state 10
+    pair  go to state 15
+
+
+State 11
 
     1 prog: pair .
 
     $default  reduce using rule 1 (prog)
 
 
-State 11
+State 12
 
     3 expr: '(' ')' .
 
     $default  reduce using rule 3 (expr)
 
 
-State 12
+State 13
 
     2 expr: '(' pair . ')'
 
-    ')'  shift, and go to state 15
+    ')'  shift, and go to state 16
 
 
-State 13
+State 14
 
     0 $accept: prog $end .
 
     $default  accept
 
 
-State 14
-
-   11 pair: expr pair .
-
-    $default  reduce using rule 11 (pair)
-
-
 State 15
+
+   12 pair: expr pair .
+
+    $default  reduce using rule 12 (pair)
+
+
+State 16
 
     2 expr: '(' pair ')' .
 

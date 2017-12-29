@@ -10,6 +10,7 @@ extern "C"
 
 extern Node* syntax_tree;
 State interpret(Node* parse_tree, State state);
+void clear_stack(void);
 
 #ifdef __cplusplus
 }

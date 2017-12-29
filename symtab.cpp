@@ -65,8 +65,17 @@ Value display(Node* node)
 
 void* get_body(Value value)
 {
-    assert(cdr(value) != NULL);
-    return (void*)( cdr(value)->value );
+    assert(value != NULL);
+
+    Node* end_pair = cdr(value);
+    assert(end_pair != NULL);
+
+    if(car(end_pair) == NULL){ // means primitive.
+        return (void*)( end_pair->value ); // primitive function pointer.
+    }
+    else{ // means user-defined.
+        return (void*)( car(end_pair) ); // defined function body.
+    }
 }
 
 Node* get_arglist(Value value)

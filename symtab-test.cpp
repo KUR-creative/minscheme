@@ -120,3 +120,40 @@ TEST_CASE("newline"){
     //printf("2");
     deinit_symtab();
 }
+
+TEST_CASE("user-defined"){
+    init_symtab();
+
+    Node* arglist = pair("end-pair", PAIR, 0ll,
+                        atom("x",GENERIC,0ll),
+                        NULL);
+    Node* body = pair("pair",PAIR,0ll,
+                     atom("add2",FUNC,0ll), // val은 0이 아니게 될 것.
+                     pair("pair",PAIR,0ll,
+                         atom("x",GENERIC,0ll),
+                         pair("pair",PAIR,0ll,
+                             atom("1",INT,1ll),
+                             NULL)));
+
+    Node* func_val = 
+        pair("lambda-expr", PAIR, 0ll, // name must be lambda-expr.
+                   atom("lambda",SPECIAL,UNKNOWN_VAL),
+                   pair("pair", PAIR, 0ll,
+                       arglist,
+                       pair("end-pair",PAIR,0ll,
+                           body,
+                           NULL)));
+    add_to_symtab("user-defined",FUNC,(Value)func_val);
+    Value val;
+    get_from_symtab("user-defined", NULL, &val);
+
+    auto obtained_arglist = get_arglist(val);
+    CHECK(obtained_arglist == arglist);
+
+    auto fp = (Node*)get_body(val);
+    REQUIRE(fp == func_val);
+    //printf("1");
+    //fp();
+    //printf("2");
+    deinit_symtab();
+}

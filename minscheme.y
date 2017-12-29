@@ -1,4 +1,4 @@
-%token INTtok IDtok DISP DEFtok BOOLtok IFtok FLOATtok
+%token INTtok IDtok DISP DEFtok BOOLtok IFtok FLOATtok LAMBDAtok
 
 %{
     #include <stdio.h>
@@ -28,7 +28,7 @@
     int             int_t;
 }
 
-%type<int_t>    INTtok IDtok DISP DEFtok BOOLtok IFtok FLOATtok
+%type<int_t>    INTtok IDtok DISP DEFtok BOOLtok IFtok FLOATtok LAMBDAtok
 %type<node_t>   expr pair
 
 %%
@@ -48,10 +48,11 @@ expr:
                           val = double_to_Value(double_val);// no cast!
                           $$ = atom(yytext, INT, val); }
     |   IDtok           { $$ = atom(yytext, GENERIC, UNKNOWN_VAL); }
-    |   DEFtok          { $$ = atom("define", SPECIAL, UNKNOWN_VAL); }
     |   BOOLtok         { long long val = ((yytext[1] == 't') ? 1 : 0);
                           $$ = atom(yytext, BOOL, val); }
+    |   DEFtok          { $$ = atom("define", SPECIAL, UNKNOWN_VAL); }
     |   IFtok           { $$ = atom("if", SPECIAL, UNKNOWN_VAL); }
+    |   LAMBDAtok       { $$ = atom("lambda", SPECIAL, UNKNOWN_VAL); }
     ;
 
 pair:

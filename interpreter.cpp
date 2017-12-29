@@ -35,6 +35,8 @@ void view_stack(Node* now_node, stack<tuple<Node,int,int>>& s){
     }
     if(! s.empty()){
         cout << '[' << get<0>(s.top()).name 
+             << ',' << get<0>(s.top()).type 
+             << ',' << get<0>(s.top()).value 
              << '|' << get<1>(s.top()) 
              << '|' << get<2>(s.top()) << ']';
     }
@@ -48,6 +50,12 @@ bool is_terminal(Node* node){
 stack<tuple<Node,int,int>> run_stack;
 stack<tuple<Node,int,int>> tmp_stack;
 
+void clear_stack(void)
+{
+    run_stack = stack<tuple<Node,int,int>>();
+    tmp_stack = stack<tuple<Node,int,int>>();
+}
+
 State interpret(Node* node, State state)
 {
     State car_state = NOstate;
@@ -56,6 +64,24 @@ State interpret(Node* node, State state)
     }
     if( car_state == ERRORstate ){
         return ERRORstate;
+    }
+    if(car_state == LAMBDAstate){
+        free(node->name); // change name to 'lambda' to apply this node.
+        node->name = strdup("lambda");
+
+        Node*   func_node   = cdr(node); 
+        Node    saving_node = *func_node; // copy!
+        free(saving_node.name); // just for dbg
+        saving_node.name = strdup("lambda");
+
+        Node*   arglist         = cadr(node); 
+        int     max_argnum      = list_len(arglist);
+        cout << '(' << max_argnum << ')' << endl;
+
+        run_stack.push( make_tuple(saving_node,max_argnum,0) );
+        //view_stack(node, run_stack); cout << endl;
+        return LL;// means "don't evaluate sub-tree of node."
+                  // do not move to cdr!
     }
 
     State cdr_state = NOstate;
@@ -67,7 +93,19 @@ State interpret(Node* node, State state)
     }
 
 
+
     //cout << '[' << node->name << '|' << state << "] \n"; 
+    if(node->type == SPECIAL){
+        if(state != LL){
+            string errmsg = string(node->name) 
+                            + string(ill_formed_special_form_errmsg);
+            fprintf(yyout, "%s", errmsg.c_str());
+            return ERRORstate;
+        }
+        if(streq(node->name,"lambda")){
+            return LAMBDAstate;
+        }
+    }
 
     if(is_terminal(node)){ 
         char* name = node->name;
@@ -98,10 +136,12 @@ State interpret(Node* node, State state)
             run_stack.push( make_tuple(*node,argnum,0) );
         }
         else{ 
-            auto    top             = run_stack.top();
-            auto    max_argnum      = get<1>(top);
-            auto    accepted_argnum = get<2>(top) + 1;
-            run_stack.push( make_tuple(*node,max_argnum,accepted_argnum) );
+            if(! run_stack.empty()){
+                auto    top             = run_stack.top();
+                auto    max_argnum      = get<1>(top);
+                auto    accepted_argnum = get<2>(top) + 1;
+                run_stack.push( make_tuple(*node,max_argnum,accepted_argnum) );
+            }
         }
     }
 
@@ -109,24 +149,51 @@ State interpret(Node* node, State state)
         auto    top         = run_stack.top();
         auto    max_argnum  = get<1>(top);
         auto    accepted_num= get<2>(top); // no push. no +1
+
+        cout << '(' << max_argnum << ',' << accepted_num << ')' << endl;
         if(max_argnum == accepted_num){ 
-            char* car_name = car(node)->name;
-            if(streq(car_name,"display")){
+            char* car_name = car(node)->name; 
+            Node* ret_node;
+            if(streq(car_name,"lambda")){
+                cout << "!!!!!!!!!!!!!!!" << endl;
+                // modify ret_node.
+            }
+            else if(streq(car_name,"display")){
                 // get arguments
                 Node arg        = get<0>(run_stack.top());
                 run_stack.pop();
-                Value disp_ptr  = get<0>(run_stack.top()).value;
+                Value func_ptr  = get<0>(run_stack.top()).value;
                 run_stack.pop();
 
-                auto func       = (pNode_Val)get_body(disp_ptr);
-                func(&arg);
+                auto func       = (pNode_Val)get_body(func_ptr);
+                ret_node = atom("no_type", NO_TYPE, func(&arg));
             }
             else if(streq(car_name, "newline")){
-                Value disp_ptr  = get<0>(run_stack.top()).value;
+                Value func_ptr  = get<0>(run_stack.top()).value;
                 run_stack.pop();
 
-                auto func       = (none_Val)get_body(disp_ptr);
-                func();
+                auto func       = (none_Val)get_body(func_ptr);
+                ret_node = atom("no_type", NO_TYPE, func());
+            }
+            else if(streq(car_name, "add2")){
+                Node arg2       = get<0>(run_stack.top());
+                run_stack.pop();
+                Node arg1       = get<0>(run_stack.top());
+                run_stack.pop();
+                Value func_ptr  = get<0>(run_stack.top()).value;
+                run_stack.pop();
+
+                auto func       = (ValxVal_Val)get_body(func_ptr);
+                ret_node = atom("int", INT, func(arg1.value, arg2.value));
+            }
+
+            // return value will be argument of func that was early called.
+            if(! run_stack.empty()){
+                auto    top         = run_stack.top();
+                auto    max_argnum  = get<1>(top);
+                auto    accepted_num= get<2>(top) + 1; 
+                run_stack.push( make_tuple(*ret_node,max_argnum,accepted_num) );
+                //del_node(&ret_node); // segfault???
             }
         }
         else{

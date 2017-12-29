@@ -7,8 +7,9 @@
 %%
     
 "define"                { return DEFtok; }
-("#t"|"#f")             { return BOOLtok; }
+"lambda"                { return LAMBDAtok; }
 "if"                    { return IFtok; }
+("#t"|"#f")             { return BOOLtok; }
     
 \.                      yyerror("invalid character"); // float error case.
 [-+]?[0-9]*\.[0-9]*     { return FLOATtok; }

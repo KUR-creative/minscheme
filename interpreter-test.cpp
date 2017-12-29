@@ -78,6 +78,7 @@ public:
             actual();
         Fclose(prog_outfile);
         Remove("out");
+        clear_stack();
         del_tree(&syntax_tree);
         syntax_tree = NULL;
     }
@@ -171,6 +172,42 @@ TEST_CASE_METHOD(IOFixture, "add2 = arg1 + arg2"){
     set_prog_src("(display (add2 2 4))");
     REQUIRE_THAT( actual(), Equals("6") );
 }
+TEST_CASE_METHOD(IOFixture, "recursive calculation 1"){
+    set_prog_src("(display (add2 1 (add2 2 3)))");
+    REQUIRE_THAT( actual(), Equals("6") );
+}
+TEST_CASE_METHOD(IOFixture, "recursive calculation 2"){
+    set_prog_src("(display (add2 (add2 10 40) (add2 (add2 4 8) 3)))");
+    REQUIRE_THAT( actual(), Equals("65") );
+}
+
+
+TEST_CASE_METHOD(IOFixture, "ill-formed special form"){
+    set_prog_src("(display lambda)",true);
+    REQUIRE_THAT( actual(), Equals(string("lambda")
+                                  +string(ill_formed_special_form_errmsg)));
+}
+// lambda
+TEST_CASE_METHOD(IOFixture, "lambda: get user-defined function"){
+    set_prog_src("(display ((lambda () 5)))",true);
+    REQUIRE_THAT( actual(), Equals("5") );
+}
+TEST_CASE_METHOD(IOFixture, "lambda: get user-defined function arg1"){
+    set_prog_src("(display ((lambda (x) 5) 3))",true);
+    REQUIRE_THAT( actual(), Equals("5") );
+}
+TEST_CASE_METHOD(IOFixture, "lambda: get arglist and body"){
+    set_prog_src("(lambda (x) 5)",true);
+    Node* func_node = cdr(car(syntax_tree)); // arglist <- funcnode -> p -> body
+    CHECK( car(car(func_node))->type == GENERIC );
+
+    Node* arglist   = car(func_node); 
+    Node* body      = cadr(func_node);
+    //cout << arglist->name << '|' << get_arglist((Value)func_node)->name << endl;
+    //cout << body->name << '|' << ((Node*)get_body((Value)func_node))->name << endl;
+    CHECK( arglist == get_arglist((Value)func_node) );
+    CHECK( body == (Node*)get_body((Value)func_node) );
+}
 /*
 TEST_CASE_METHOD(IOFixture, "=: int x int -> bool"){
     set_prog_src("(display (= 1 1))");
@@ -180,14 +217,6 @@ TEST_CASE_METHOD(IOFixture, "=: int x int -> bool"){
 TEST_CASE_METHOD(IOFixture, "sub2 = arg1 - arg2"){
     set_prog_src("(display (sub2 2 40))");
     REQUIRE_THAT( actual(), Equals("-38") );
-}
-TEST_CASE_METHOD(IOFixture, "recursive calculation 1"){
-    set_prog_src("(display (add2 1 (add2 2 3)))");
-    REQUIRE_THAT( actual(), Equals("6") );
-}
-TEST_CASE_METHOD(IOFixture, "recursive calculation 2"){
-    set_prog_src("(display (add2 (add2 10 40) (add2 (sub2 4 8) 3)))");
-    REQUIRE_THAT( actual(), Equals("49") );
 }
 
 
